@@ -351,14 +351,11 @@ export function CareAndFaq({ showCutoff }: { showCutoff: boolean }) {
     <section className="band">
       <div className="wrap care">
         <div>
-          <h2>Let them win at the end</h2>
+          {/* The play routine lives in the buy section's "Let your cat win at the end" callout; this keeps the safety notes. */}
+          <h2>Play it safe</h2>
           <p>
-            Light toys never get caught. Finish each session by tossing a real toy your cat can grab, so the hunt ends
-            with a catch.
-          </p>
-          <p>
-            Play in 10 to 15 minute sessions, stay in the room, and unplug it between games. Keep the cable away from
-            cats that chew, and don&apos;t point the lens at anyone&apos;s eyes. Not a toy for children under 3.
+            Keep the cable away from cats that chew, and don&apos;t point the lens at anyone&apos;s eyes. Not a toy for
+            children under 3.
           </p>
         </div>
         <div className="faq" id="faq">
