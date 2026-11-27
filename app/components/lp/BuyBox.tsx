@@ -136,21 +136,6 @@ export function BuySection({
             A 6.3-inch cat head that sits on the floor and projects glowing mice popping in and out of mouse holes.
             Get one for your cat, or one to keep and one to give.
           </p>
-          {/* The one play rule every buyer should read before choosing. */}
-          <aside className="winTip" aria-labelledby="winTipTitle">
-            <svg className="winTip-ic" width="40" height="40" viewBox="0 0 40 40" aria-hidden="true">
-              <circle cx="20" cy="20" r="20" fill="currentColor" />
-              <path d="M20 10v13" stroke="#fff" strokeWidth="4" strokeLinecap="round" />
-              <circle cx="20" cy="29.5" r="2.4" fill="#fff" />
-            </svg>
-            <div>
-              <h3 id="winTipTitle">Let your cat win at the end</h3>
-              <p>
-                Light can&apos;t be caught, so finish each 10 to 15 minute session by tossing a real toy your cat can
-                grab. Stay in the room while it runs and unplug it between games.
-              </p>
-            </div>
-          </aside>
           <BundlePicker
             offers={offers}
             selected={selected}

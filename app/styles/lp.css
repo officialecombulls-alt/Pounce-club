@@ -112,8 +112,10 @@ html:has(.lp) {
 .lp .add { width: 100%; margin-top: 18px; min-height: 58px; font-size: 19px; }
 .lp .buyError { margin-top: 10px; color: var(--red); font-weight: 700; font-size: 15px; }
 
-/* "Let your cat win at the end" callout in the buy section */
-.lp .winTip { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 18px; align-items: start; margin: 0 0 24px; padding: 22px 24px; border: 1.5px solid light-dark(#f3d3cf, #4a2a26); border-radius: 18px; background: light-dark(#fbeeec, #2a1815); max-width: 560px; }
+/* "Let your cat win at the end" callout between the hero and the buy section */
+/* Sits between the hero and the buy section; the buy band's own top padding gives the gap below. */
+.lp .tipBand { padding: clamp(28px, 4vw, 48px) max(5vw, 16px) 0; }
+.lp .winTip { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 18px; align-items: start; margin: 0 auto; padding: 22px 24px; border: 1.5px solid light-dark(#f3d3cf, #4a2a26); border-radius: 18px; background: light-dark(#fbeeec, #2a1815); max-width: 760px; }
 .lp .winTip-ic { color: #d7262d; margin-top: 2px; }
 .lp .winTip h3 { font: 800 22px/1.25 "Nunito Sans", sans-serif; letter-spacing: -.01em; }
 .lp .winTip p { margin-top: 6px; color: var(--soft); font-size: 17px; line-height: 1.6; }

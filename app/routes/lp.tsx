@@ -16,6 +16,7 @@ import {
   Watch,
   Specs,
   Why,
+  WinTip,
 } from "~/components/lp/LpSections";
 import { type LpCartLine, type LpVariant, useLpCheckout } from "~/components/lp/useLpCheckout";
 import {
@@ -32,8 +33,12 @@ import lpStylesHref from "~/styles/lp.css?url";
 
 import type { Route } from "./+types/lp";
 
+// $country/$language are filled by Hydrogen from the storefront locale (US, see
+// app/lib/shop.ts). Without @inContext, Shopify picks the market from the
+// visitor's IP, so a visitor in Nepal would see NPR prices.
 const LP_PRODUCT_QUERY = gql(`
-  query LandingPageProduct($handle: String!) {
+  query LandingPageProduct($handle: String!, $country: CountryCode, $language: LanguageCode)
+  @inContext(country: $country, language: $language) {
     product(handle: $handle) {
       id
       handle
@@ -163,8 +168,10 @@ export async function loader({ context, params }: Route.LoaderArgs) {
   };
 }
 
+// Same US context for the cart, so checkout opens in USD wherever the visitor is.
 const LP_CHECKOUT_MUTATION = gql(`
-  mutation LandingPageCheckout($lines: [CartLineInput!]!) {
+  mutation LandingPageCheckout($lines: [CartLineInput!]!, $country: CountryCode, $language: LanguageCode)
+  @inContext(country: $country, language: $language) {
     cartCreate(input: { lines: $lines }) {
       cart {
         checkoutUrl
@@ -314,6 +321,7 @@ export default function LandingPage({ loaderData }: Route.ComponentProps) {
           fromPrice={single ? formatMoney(single.total, single.currencyCode) : null}
           hasClips={clips.some(Boolean)}
         />
+        <WinTip />
         <BuySection
           title={product.title}
           images={product.images}

@@ -59,6 +59,28 @@ export function Hero({ fromPrice, hasClips }: { fromPrice: string | null; hasCli
   );
 }
 
+/** The one play rule every buyer should read, right under the hero. */
+export function WinTip() {
+  return (
+    <section className="tipBand" aria-labelledby="winTipTitle">
+      <aside className="winTip">
+        <svg className="winTip-ic" width="40" height="40" viewBox="0 0 40 40" aria-hidden="true">
+          <circle cx="20" cy="20" r="20" fill="currentColor" />
+          <path d="M20 10v13" stroke="#fff" strokeWidth="4" strokeLinecap="round" />
+          <circle cx="20" cy="29.5" r="2.4" fill="#fff" />
+        </svg>
+        <div>
+          <h3 id="winTipTitle">Let your cat win at the end</h3>
+          <p>
+            Light can&apos;t be caught, so finish each 10 to 15 minute session by tossing a real toy your cat can grab.
+            Stay in the room while it runs and unplug it between games.
+          </p>
+        </div>
+      </aside>
+    </section>
+  );
+}
+
 const CLIP_COPY = [
   { title: "Lights down, mice out", text: "The plug-in, the dark room and the first mouse.", x: 30 },
   { title: "The first pounce", text: "Close on paws hitting a glowing hole.", x: 60 },
