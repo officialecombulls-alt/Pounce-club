@@ -4,6 +4,7 @@ import { shopifyImageUrl, srcSetForWidths } from "~/lib/image";
 
 import { type BundleOffer, formatMoney } from "./bundles";
 import { BundlePicker } from "./BundlePicker";
+import { RatingLink, type ReviewSummary } from "./Reviews";
 
 export type LpImage = {
   url: string;
@@ -105,6 +106,7 @@ function ProductStage({ images, title }: { images: LpImage[]; title: string }) {
 
 export function BuySection({
   title,
+  rating,
   images,
   offers,
   selected,
@@ -116,6 +118,8 @@ export function BuySection({
   paymentMethods,
 }: {
   title: string;
+  /** Review average and count; the rating link shows only when there are reviews. */
+  rating: ReviewSummary | null;
   images: LpImage[];
   offers: BundleOffer[];
   selected: BundleOffer | undefined;
@@ -132,6 +136,7 @@ export function BuySection({
         <ProductStage images={images} title={title} />
         <div>
           <h2>{title}</h2>
+          <RatingLink summary={rating} />
           <p className="lede">
             A 6.3-inch cat head that sits on the floor and projects glowing mice popping in and out of mouse holes.
             Get one for your cat, or one to keep and one to give.

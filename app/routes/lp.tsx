@@ -5,6 +5,7 @@ import { data as dataResponse, redirect, useRouteLoaderData } from "react-router
 import { bundleOffers, formatMoney, projectorCount } from "~/components/lp/bundles";
 import { BuySection, buyLabel, type LpImage } from "~/components/lp/BuyBox";
 import { LpDefs } from "~/components/lp/LpArt";
+import { type Review, Reviews, reviewSummary } from "~/components/lp/Reviews";
 import { LpFooter, LpNav, LpStrip, StickyBar } from "~/components/lp/LpChrome";
 import {
   CareAndFaq,
@@ -118,6 +119,79 @@ const LP_PRODUCT_QUERY = gql(`
   }
 `);
 
+// Customer reviews: "Review" metaobject entries (Content → Metaobjects → Review).
+// Separate query so a missing or misconfigured definition never breaks the page.
+const LP_REVIEWS_QUERY = gql(`
+  query LandingPageReviews {
+    metaobjects(type: "review", first: 100) {
+      nodes {
+        id
+        updatedAt
+        fields {
+          key
+          value
+          reference {
+            ... on MediaImage {
+              image {
+                url
+                altText
+                width
+                height
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`);
+
+type ReviewNode = {
+  id: string;
+  updatedAt: string;
+  fields: ReadonlyArray<{ key: string; value?: string | null; reference?: MetafieldRef }>;
+};
+
+/**
+ * Review fields: name, rating (Shopify "Rating" type or a number), review (or body),
+ * and optional photo, location, date and verified. Entries missing a name, text
+ * or a 1–5 rating are skipped. Newest first by `date`, then by last edit.
+ */
+function parseReviews(nodes: readonly ReviewNode[]): Review[] {
+  const reviews: Array<Review & { sortKey: string }> = [];
+  for (const node of nodes) {
+    const field = (key: string) => node.fields.find((candidate) => candidate.key === key);
+    const text = (key: string) => field(key)?.value?.trim() || null;
+    let ratingValue = text("rating");
+    if (ratingValue?.startsWith("{")) {
+      try {
+        ratingValue = String((JSON.parse(ratingValue) as { value?: unknown }).value ?? "");
+      } catch {
+        ratingValue = null;
+      }
+    }
+    const rating = Number(ratingValue);
+    const name = text("name");
+    const body = text("review") ?? text("body");
+    if (!name || !body || !Number.isFinite(rating) || rating < 1 || rating > 5) continue;
+    const date = text("date");
+    reviews.push({
+      id: node.id,
+      name,
+      rating: Math.round(rating * 10) / 10,
+      body,
+      location: text("location"),
+      date,
+      photo: asImage(field("photo")?.reference),
+      verified: text("verified") === "true",
+      sortKey: date ?? node.updatedAt,
+    });
+  }
+  return reviews
+    .sort((a, b) => b.sortKey.localeCompare(a.sortKey))
+    .map(({ sortKey: _sortKey, ...review }) => review);
+}
+
 /** The landing page renders its own header and footer. */
 export const handle = { storeChrome: false };
 
@@ -158,11 +232,18 @@ export async function loader({ context, params }: Route.LoaderArgs) {
   if (!handle) throw new Response("Not Found", { status: 404 });
 
   const storefrontClient = context.get(storefrontClientContext);
-  const { data, errors } = await storefrontClient.graphql(LP_PRODUCT_QUERY, {
-    variables: { handle },
-  });
+  const [{ data, errors }, reviewsResult] = await Promise.all([
+    storefrontClient.graphql(LP_PRODUCT_QUERY, { variables: { handle } }),
+    storefrontClient.graphql(LP_REVIEWS_QUERY).catch((error: unknown) => {
+      console.error("Landing page reviews query failed", error);
+      return null;
+    }),
+  ]);
   if (errors?.length) {
     console.error(`Landing page product query failed: ${errors.map((e) => e.message).join("\n")}`);
+  }
+  if (reviewsResult?.errors?.length) {
+    console.error(`Landing page reviews query failed: ${reviewsResult.errors.map((e) => e.message).join("\n")}`);
   }
   if (!data?.product) throw new Response("Not Found", { status: 404 });
 
@@ -184,6 +265,7 @@ export async function loader({ context, params }: Route.LoaderArgs) {
     },
     clips,
     whyImage: asImage(product.lpWhyImage?.reference as MetafieldRef),
+    reviews: parseReviews((reviewsResult?.data?.metaobjects?.nodes ?? []) as readonly ReviewNode[]),
     christmasActive: Date.now() < CHRISTMAS_CUTOFF,
   };
 }
@@ -288,7 +370,8 @@ function ProductViewedTracker({
 }
 
 export default function LandingPage({ loaderData }: Route.ComponentProps) {
-  const { product, clips, whyImage, christmasActive } = loaderData;
+  const { product, clips, whyImage, reviews, christmasActive } = loaderData;
+  const ratingSummary = reviewSummary(reviews);
   const rootData = useRouteLoaderData<typeof rootLoader>("root");
   const paymentMethods = rootData?.shopInfo.paymentMethods ?? [];
 
@@ -343,6 +426,7 @@ export default function LandingPage({ loaderData }: Route.ComponentProps) {
         />
         <BuySection
           title={product.title}
+          rating={ratingSummary}
           images={product.images}
           offers={offers}
           selected={selected}
@@ -357,6 +441,7 @@ export default function LandingPage({ loaderData }: Route.ComponentProps) {
         <Watch videos={clips} />
         <HowItWorks />
         <Why image={whyImage} />
+        <Reviews reviews={reviews} />
         <Specs />
         <Gift
           duoLabel={duo ? formatMoney(duo.total, duo.currencyCode) : null}

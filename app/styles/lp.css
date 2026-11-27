@@ -203,6 +203,35 @@ html:has(.lp) {
 .lp .why-row li svg { width: 52px; height: 52px; display: block; margin-bottom: 14px; }
 .lp .why-row li p { color: var(--soft); margin-top: 6px; font-size: 16px; }
 
+/* reviews (Shopify "review" metaobjects; hidden until there is one) */
+.lp .rating-link { display: inline-flex; align-items: center; gap: 8px; margin: 0 0 12px; font-size: 15px; font-weight: 700; color: var(--soft); text-decoration: none; }
+.lp .rating-link:hover > span:last-child { text-decoration: underline; }
+.lp .stars { position: relative; display: inline-block; line-height: 1; letter-spacing: 2px; white-space: nowrap; }
+.lp .stars-sm { font-size: 17px; }
+.lp .stars-lg { font-size: 26px; }
+.lp .stars-base { color: light-dark(#ecd3ce, #4a3530); }
+.lp .stars-fill { position: absolute; left: 0; top: 0; overflow: hidden; color: var(--red); }
+.lp .rev-top { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: clamp(20px, 4vw, 48px); align-items: center; max-width: 760px; margin-bottom: 22px; padding: 24px 28px; border-radius: 20px; background: var(--panel); }
+.lp .rev-score { display: grid; justify-items: start; gap: 8px; }
+.lp .rev-score strong { font: 400 clamp(48px, 6vw, 64px)/1 "Lilita One", sans-serif; }
+.lp .rev-score > span:last-child { font-size: 14px; color: var(--soft); font-weight: 600; }
+.lp .rev-bars { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.lp .rev-bars li { display: grid; grid-template-columns: 34px minmax(0, 1fr) 28px; gap: 10px; align-items: center; font-size: 14px; font-weight: 700; }
+.lp .rev-bar { height: 8px; border-radius: 99px; background: var(--bg); overflow: hidden; }
+.lp .rev-bar i { display: block; height: 100%; border-radius: 99px; background: var(--red); }
+.lp .rev-bar-count { color: var(--soft); text-align: right; }
+.lp .rev-row { display: flex; align-items: flex-start; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-width: none; padding-bottom: 6px; }
+.lp .rev-row::-webkit-scrollbar { display: none; }
+.lp .review { flex: 0 0 calc((100% - 32px) / 3); scroll-snap-align: start; display: flex; flex-direction: column; gap: 12px; padding: 20px; border: 1px solid var(--line); border-radius: 18px; background: var(--card); }
+.lp .rev-photo { display: block; width: 100%; height: auto; aspect-ratio: 4/3; object-fit: cover; border-radius: 12px; }
+.lp .rev-body { font-size: 16px; line-height: 1.55; }
+.lp .review footer { display: flex; align-items: center; gap: 10px; }
+.lp .rev-avatar { flex: none; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--red); color: #fff; font: 400 18px "Lilita One", sans-serif; }
+.lp .rev-who b { display: block; font-size: 15px; }
+.lp .rev-meta { display: flex; flex-wrap: wrap; gap: 2px 10px; font-size: 13px; color: var(--soft); font-weight: 600; }
+.lp .rev-verified { color: var(--ok); }
+.lp .arrows.rev-arrows button { border-color: var(--line); color: var(--ink); }
+
 /* specs */
 .lp .panel { background: var(--panel); }
 .lp .specs { max-width: 760px; }
@@ -265,6 +294,7 @@ html:has(.lp) {
 @media (max-width: 900px) {
   .lp .buy, .lp .why-top, .lp .care, .lp .gift .wrap { grid-template-columns: minmax(0, 1fr); }
   .lp .why-row li { flex-basis: 44%; }
+  .lp .review { flex-basis: 46%; }
   /* relative, not static: the photo arrows are positioned inside the stage. Stays square (1:1) like desktop. */
   .lp .stage { position: relative; top: auto; }
   .lp .clip { flex-basis: 46%; }
@@ -280,9 +310,11 @@ html:has(.lp) {
   .lp .steps { grid-template-columns: minmax(0, 1fr); }
   .lp .clip { flex-basis: 72%; }
   .lp .why-row li { flex-basis: 78%; }
+  .lp .review { flex-basis: 82%; }
   .lp .bar.visible { display: flex; }
 }
 @media (max-width: 480px) {
+  .lp .rev-top { grid-template-columns: minmax(0, 1fr); padding: 20px; }
   .lp .card { grid-template-columns: 96px minmax(0, 1fr); padding: 10px 14px 10px 10px; gap: 12px; }
   .lp .b-scene { width: 96px; height: 72px; }
   .lp .card .amt { grid-column: 2; text-align: left; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }

@@ -5,7 +5,7 @@ Every key and amount below is copied from the code (`app/routes/lp.tsx` and
 `app/lib/lp-config.ts`). If you change one in Shopify, it has to change in the code too.
 
 **What updates by itself** once it's saved in Shopify: price, compare-at price, product
-title, product photos, the 4 clip videos, the "Why" photo, the payment methods line and the policies.
+title, product photos, the 4 clip videos, the "Why" photo, reviews, the payment methods line and the policies.
 **What needs a code change:** wording on the page, the pack discounts shown on the page,
 delivery times, the Christmas date, layout and new sections.
 
@@ -67,6 +67,33 @@ One more product metafield (**Settings → Metafields and metaobjects → Produc
 Upload one landscape photo, ideally a cat crouched or pouncing at the projected mice in a dim room. It shows
 beside the heading, cropped to **4:3 from the center**, so keep the cat in the middle. Use at least 1440 px wide.
 Until it's uploaded, the slot shows the design's illustration.
+
+## 3b. Customer reviews (metaobject)
+The "What cat owners say" section and the star rating under the product title read **Review** entries.
+Both stay hidden until there is at least one **Active** review. Only add real customer reviews.
+
+**Settings → Metafields and metaobjects → Metaobjects → Add definition**
+- **Name:** `Review`. **Type (handle):** must be exactly **`review`**.
+- **Fields** (the key is shown under each field name; edit it to match exactly):
+
+| Field name | Key | Type | Required |
+|---|---|---|---|
+| Name | `name` | Single line text | Yes |
+| Rating | `rating` | Rating (min 1, max 5) | Yes |
+| Review | `review` | Multi-line text | Yes |
+| Photo | `photo` | File, One file, Images | No |
+| Location | `location` | Single line text | No |
+| Date | `date` | Date | No |
+| Verified | `verified` | True or false | No |
+
+- **Options:** turn on **Storefronts access**, and turn on **Active-draft status**.
+- **Save.**
+
+**Add reviews:** **Content → Metaobjects → Review → Add entry**. Fill the fields, set the status to **Active**, then **Save**.
+An entry left as Draft stays hidden.
+
+How it shows: newest first (by Date, else by last edit), with average, star breakdown and a swipeable row
+of cards. "✓ Verified buyer" shows when Verified is on. Photos are cropped to 4:3 from the center.
 
 ## 4. Pack discounts (2-pack and 3-pack)
 The page shows 2-pack and 3-pack prices, but **Shopify only charges them if these discounts exist**.
