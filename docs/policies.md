@@ -1,16 +1,23 @@
-# Pounce Club policies: ready to paste
+# Pounce Club policies
 
-Paste each block into **Shopify admin → Settings → Policies**, into the matching field, and **Save**.
-The site shows them at `/policies/shipping-policy`, `/policies/refund-policy` and `/policies/terms-of-service`.
-Short title lines (like "Where we ship") are shown in bold automatically.
+**These are already live on the site.** `pounceclub.store/policies/shipping-policy`, `/refund-policy` and
+`/terms-of-service` show this text (from `app/lib/policies.ts`) whenever the policy is empty in Shopify.
 
-This is plain-English wording for a small store, not legal advice.
+**Still paste them into Shopify admin → Settings → Policies** (each block into its field, then Save): Shopify
+checkout and order emails link to Shopify's copy, not the site's. Once a policy is saved in Shopify, the site
+shows Shopify's version instead, so edit it there from then on.
+
+Short title lines (like "Where we ship") are shown in bold automatically. This is plain-English wording for a
+small store, not legal advice.
 
 **Decisions I made. Tell me if any are wrong and I'll rewrite:**
-1. **US only.** You told me US shipping is free, but nothing about other countries, so the policy says you ship to the United States.
-2. **No promised delivery time.** You didn't give one, so the policy points to the estimate shown at checkout. Send me a range (e.g. "5–8 business days") and I'll add it.
-3. **No return needed for a refund.** The customer emails within 45 days of delivery and gets refunded without sending the projector back. If you want it back first, I'll swap in the "send it back" version, and we need to decide who pays return shipping.
-4. **Lost packages:** replacement or full refund if tracking stalls for 7 days, or the order hasn't arrived 14 days after the estimated date.
+1. **US only.** Free tracked shipping on every US order; ships in 1 to 3 days, arrives in 5 to 10 business days.
+2. **No return needed for a refund.** The customer emails within 45 days of delivery and gets refunded without sending the projector back. If you want it back first, I'll swap in a "send it back" version (and we decide who pays return shipping).
+3. **Lost packages:** replacement or full refund if tracking stalls for 7 days, or the order hasn't arrived 14 days after the estimated date.
+
+**Privacy policy:** yours is saved in Shopify, so the site shows it. It lists a Gmail address as the contact;
+the site shows `contact@pounceclub.store` in its place, but **edit it in Shopify too** (Settings → Policies →
+Privacy policy) so checkout and emails match.
 
 ---
 
@@ -20,8 +27,11 @@ This is plain-English wording for a small store, not legal advice.
 Where we ship
 We currently ship to addresses in the United States.
 
-Free US shipping
-Shipping is free on every order. Your estimated delivery date is shown at checkout before you pay.
+Free tracked shipping
+Shipping is free on every order. Every order ships with tracking.
+
+How long it takes
+We prepare and ship orders within 1 to 3 days. Delivery then takes 5 to 10 business days. Your estimated delivery date is also shown at checkout before you pay.
 
 Tracking your order
 As soon as your order ships, we'll email you a tracking link.
@@ -53,10 +63,10 @@ Email contact@pounceclub.store with:
 That's all we need. You don't need to send the product back.
 
 What we refund
-We refund the full amount you paid for the items. Refunds go back to your original payment method. Once we've approved your refund, it usually takes your bank or card provider 5–10 business days to show it.
+We refund the full amount you paid for the items. Refunds go back to your original payment method. Once we've approved your refund, it usually takes your bank or card provider 5 to 10 business days to show it.
 
 Packs
-You can ask for a refund on a whole Duo or Trio pack or just part of it. If you keep part of a pack, we'll refund the projectors you're not keeping at the per-projector price you paid.
+You can ask for a refund on a whole 2-pack or 3-pack, or just part of it. If you keep part of a pack, we'll refund the projectors you're not keeping at the per-projector price you paid.
 
 Damaged, faulty or missing items
 If your order arrives damaged, something doesn't work, or something is missing, email us within 45 days of delivery with your order number and a photo or short video of the problem. We'll send a free replacement or a full refund, whichever you prefer.
@@ -75,10 +85,10 @@ Overview
 This website and store are operated by Pounce Club ("Pounce Club", "we", "us"). By using pounceclub.store or placing an order, you agree to these terms.
 
 Products and safety
-MouseDash is a toy for supervised play. Stay nearby while your cat plays, and unplug the projector when you're done. Keep the power cable out of reach of pets that chew. Product photos are for illustration.
+MouseDash is a toy for supervised play. Stay nearby while your cat plays, and unplug the projector between games. Keep the power cable out of reach of pets that chew, and don't point the lens at anyone's eyes. Not a toy for children under 3. Product photos and videos are for illustration.
 
 Prices and payment
-Prices are shown in your checkout currency and can change at any time. If an item is listed at the wrong price because of an error, we may cancel the order and give you a full refund. We may refuse or cancel any order, for example if we suspect fraud. If we cancel, you'll get a full refund.
+Prices are shown in US dollars and can change at any time. If an item is listed at the wrong price because of an error, we may cancel the order and give you a full refund. We may refuse or cancel any order, for example if we suspect fraud. If we cancel, you'll get a full refund.
 
 Shipping, returns and refunds
 Shipping is covered by our Shipping Policy, and refunds and returns by our Refund Policy. Both are part of these terms.
@@ -101,7 +111,3 @@ These terms are governed by the laws of the country where Pounce Club is registe
 Contact
 Questions about these terms? Email contact@pounceclub.store.
 ```
-
-## Privacy policy
-Yours is already saved. Open it and check its contact email: Shopify often fills in the account owner's
-personal email. Replace it with `contact@pounceclub.store`.

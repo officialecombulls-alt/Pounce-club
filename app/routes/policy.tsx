@@ -3,6 +3,7 @@ import { gql } from "@shopify/hydrogen";
 import { LpPage } from "~/components/lp/LpPage";
 import lpStylesHref from "~/styles/lp.css?url";
 
+import { SITE_POLICIES, withBrandEmail } from "~/lib/policies";
 import { storefrontClientContext } from "~/lib/storefront";
 import { formatPageTitle, getShopNameFromRootMatch } from "~/lib/storefront-shop";
 
@@ -10,7 +11,8 @@ import type { Route } from "./+types/policy";
 
 /**
  * Store policies (/policies/refund-policy, shipping-policy, privacy-policy,
- * terms-of-service), written in Shopify admin under Settings → Policies.
+ * terms-of-service). Shopify's version (Settings → Policies) is used when it is
+ * saved; otherwise the site's own text from app/lib/policies.ts.
  */
 const POLICY_QUERY = gql(`
   query StorePolicies {
@@ -68,15 +70,19 @@ export async function loader({ context, params }: Route.LoaderArgs) {
   const policy = [shop?.privacyPolicy, shop?.refundPolicy, shop?.shippingPolicy, shop?.termsOfService].find(
     (candidate) => candidate?.handle === params.handle,
   );
-  if (!policy) throw new Response("Not Found", { status: 404 });
-  return { policy: { ...policy, body: boldSectionTitles(policy.body) } };
+  if (policy?.body?.trim()) {
+    return { policy: { title: policy.title, body: withBrandEmail(boldSectionTitles(policy.body)) } };
+  }
+  const sitePolicy = params.handle ? SITE_POLICIES[params.handle] : undefined;
+  if (!sitePolicy) throw new Response("Not Found", { status: 404 });
+  return { policy: { title: sitePolicy.title, body: sitePolicy.body } };
 }
 
 export default function PolicyRoute({ loaderData }: Route.ComponentProps) {
   const { policy } = loaderData;
   return (
     <LpPage title={policy.title}>
-      {/* Policy HTML is authored by the merchant in Shopify admin. */}
+      {/* Policy HTML from Shopify admin, or the site's own text (app/lib/policies.ts). */}
       <div className="policy-body" dangerouslySetInnerHTML={{ __html: policy.body }} />
     </LpPage>
   );
