@@ -9,6 +9,7 @@ import {
   PRODUCT_SHORT_NAME,
 } from "~/lib/lp-config";
 
+import type { LpImage } from "./BuyBox";
 import { NightScene } from "./LpArt";
 
 /** A video from a file metafield (`Video` reference). */
@@ -59,7 +60,7 @@ export function Hero({ fromPrice, hasClips }: { fromPrice: string | null; hasCli
   );
 }
 
-/** The one play rule every buyer should read, right under the hero. */
+/** The one play rule every buyer should read, right after the buy button. */
 export function WinTip() {
   return (
     <section className="tipBand" aria-labelledby="winTipTitle">
@@ -199,32 +200,63 @@ export function HowItWorks() {
   );
 }
 
-export function Why() {
+const WHY_WIDTHS = [480, 720, 960, 1200, 1440];
+
+/** "Why cats can't leave it alone": text + photo, then the four reasons as one swipeable row. */
+export function Why({ image }: { image: LpImage | null }) {
+  const cropped = (width: number) =>
+    image ? shopifyImageUrl(image.url, { width, height: Math.round((width * 3) / 4), crop: "center" }) : "";
+  const widths = image?.width ? WHY_WIDTHS.filter((w) => w <= image.width!) : WHY_WIDTHS;
+  const list = widths.length ? widths : WHY_WIDTHS.slice(0, 1);
+
   return (
     <section className="band panel">
-      <div className="wrap why">
-        <div>
-          <h2>Why cats can&apos;t leave it alone</h2>
-          <p>
-            Cats are built to stalk, crouch and pounce. A mouse that keeps escaping into another hole gives them a
-            reason to try again.
-          </p>
+      <div className="wrap">
+        <div className="why-top">
+          <div>
+            <h2>Why cats can&apos;t leave it alone</h2>
+            <p>
+              Cats are built to stalk, crouch and pounce. A mouse that keeps escaping into another hole gives them a
+              reason to try again.
+            </p>
+          </div>
+          <figure className="why-pic">
+            {image ? (
+              <img
+                src={cropped(list[Math.min(1, list.length - 1)])}
+                srcSet={list.map((w) => `${cropped(w)} ${w}w`).join(", ")}
+                sizes="(max-width: 900px) calc(100vw - 32px), 50vw"
+                width={list[list.length - 1]}
+                height={Math.round((list[list.length - 1] * 3) / 4)}
+                alt={image.altText || "A cat crouched over a glowing mouse hole"}
+                loading="lazy"
+                decoding="async"
+              />
+            ) : (
+              // Placeholder until a photo is uploaded to the lp_why_image metafield.
+              <svg viewBox="0 0 160 120" preserveAspectRatio="xMidYMax slice" role="img" aria-label="A glowing mouse darting between mouse holes next to the projector">
+                <ellipse cx="96" cy="96" rx="20" ry="6" fill="url(#hole)" />
+                <ellipse cx="132" cy="80" rx="14" ry="4.5" fill="url(#hole)" />
+                <ellipse cx="70" cy="76" rx="12" ry="4" fill="url(#hole)" />
+                <use href="#mouse" x="100" y="72" width="26" height="12" />
+                <use href="#dev" x="10" y="54" width="48" height="58" />
+              </svg>
+            )}
+          </figure>
         </div>
-        <ul>
+        <ul className="why-row" aria-label="Why cats love it">
           <li>
             <svg viewBox="0 0 52 52" aria-hidden="true">
-              <circle cx="26" cy="26" r="25" fill="var(--bg)" />
+              <circle cx="26" cy="26" r="25" fill="var(--panel)" />
               <ellipse cx="26" cy="32" rx="14" ry="5" fill="#2a0709" />
               <use href="#mouse" x="14" y="13" width="26" height="14" />
             </svg>
-            <div>
-              <h3>It moves like prey</h3>
-              <p>Mice pop out, dart across the floor and vanish, so there is always a next target.</p>
-            </div>
+            <h3>It moves like prey</h3>
+            <p>Mice pop out, dart across the floor and vanish, so there is always a next target.</p>
           </li>
           <li>
             <svg viewBox="0 0 52 52" aria-hidden="true">
-              <circle cx="26" cy="26" r="25" fill="var(--bg)" />
+              <circle cx="26" cy="26" r="25" fill="var(--panel)" />
               <path
                 d="M16 36h20M20 36V24l6-6 6 6v12"
                 fill="none"
@@ -233,33 +265,27 @@ export function Why() {
                 strokeLinejoin="round"
               />
             </svg>
-            <div>
-              <h3>It plays while you rest</h3>
-              <p>No wand to wave or pointer to hold after a long day.</p>
-            </div>
+            <h3>It plays while you rest</h3>
+            <p>No wand to wave or pointer to hold after a long day.</p>
           </li>
           <li>
             <svg viewBox="0 0 52 52" aria-hidden="true">
-              <circle cx="26" cy="26" r="25" fill="var(--bg)" />
+              <circle cx="26" cy="26" r="25" fill="var(--panel)" />
               <path d="M33 15a12 12 0 1 0 5 17 10 10 0 0 1-5-17z" fill="var(--red)" />
             </svg>
-            <div>
-              <h3>It takes the edge off evenings</h3>
-              <p>A play session before bed can help with the 3 a.m. zoomies.</p>
-            </div>
+            <h3>It takes the edge off evenings</h3>
+            <p>A play session before bed can help with the 3 a.m. zoomies.</p>
           </li>
           <li>
             <svg viewBox="0 0 52 52" aria-hidden="true">
-              <circle cx="26" cy="26" r="25" fill="var(--bg)" />
+              <circle cx="26" cy="26" r="25" fill="var(--panel)" />
               <ellipse cx="17" cy="30" rx="7" ry="3" fill="#2a0709" />
               <ellipse cx="35" cy="22" rx="7" ry="3" fill="#2a0709" />
               <circle cx="17" cy="30" r="9" fill="none" stroke="var(--red)" strokeWidth="2" />
               <circle cx="35" cy="22" r="9" fill="none" stroke="var(--red)" strokeWidth="2" />
             </svg>
-            <div>
-              <h3>Room for two cats</h3>
-              <p>Several holes light at once, so each cat can pick a spot.</p>
-            </div>
+            <h3>Room for two cats</h3>
+            <p>Several holes light at once, so each cat can pick a spot.</p>
           </li>
         </ul>
       </div>

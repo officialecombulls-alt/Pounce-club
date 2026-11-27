@@ -5,7 +5,7 @@ Every key and amount below is copied from the code (`app/routes/lp.tsx` and
 `app/lib/lp-config.ts`). If you change one in Shopify, it has to change in the code too.
 
 **What updates by itself** once it's saved in Shopify: price, compare-at price, product
-title, product photos, the 4 clip videos, the payment methods line and the policies.
+title, product photos, the 4 clip videos, the "Why" photo, the payment methods line and the policies.
 **What needs a code change:** wording on the page, the pack discounts shown on the page,
 delivery times, the Christmas date, layout and new sections.
 
@@ -56,6 +56,17 @@ Empty frames keep the design's illustration. **Once at least one clip is uploade
 the mice look brighter than they are." Only upload clips that make those true.
 
 If you created the earlier metafields (`lp_chase_video`, `lp_projection_image`, `lp_room_image`, `lp_kit_image`), the new design doesn't use them. You can delete them.
+
+### "Why cats can't leave it alone" photo
+One more product metafield (**Settings → Metafields and metaobjects → Products → Add definition**):
+
+| Name | Namespace and key | Type | Accepts | Storefronts access |
+|---|---|---|---|---|
+| LP Why image | `custom.lp_why_image` | File · **One file** | Images | **On** |
+
+Upload one landscape photo, ideally a cat crouched or pouncing at the projected mice in a dim room. It shows
+beside the heading, cropped to **4:3 from the center**, so keep the cat in the middle. Use at least 1440 px wide.
+Until it's uploaded, the slot shows the design's illustration.
 
 ## 4. Pack discounts (2-pack and 3-pack)
 The page shows 2-pack and 3-pack prices, but **Shopify only charges them if these discounts exist**.

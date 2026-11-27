@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { data as dataResponse, redirect, useRouteLoaderData } from "react-router";
 
 import { bundleOffers, formatMoney, projectorCount } from "~/components/lp/bundles";
-import { BuySection, buyLabel } from "~/components/lp/BuyBox";
+import { BuySection, buyLabel, type LpImage } from "~/components/lp/BuyBox";
 import { LpDefs } from "~/components/lp/LpArt";
 import { LpFooter, LpNav, LpStrip, StickyBar } from "~/components/lp/LpChrome";
 import {
@@ -64,6 +64,20 @@ const LP_PRODUCT_QUERY = gql(`
         references(first: 4) {
           nodes {
             ...LpVideo
+          }
+        }
+      }
+      # Photo for "Why cats can't leave it alone" (Products → MouseDash → Metafields).
+      # Empty keeps the design's illustration.
+      lpWhyImage: metafield(namespace: "custom", key: "lp_why_image") {
+        reference {
+          ... on MediaImage {
+            image {
+              url
+              altText
+              width
+              height
+            }
           }
         }
       }
@@ -129,6 +143,11 @@ export function meta({ data }: Route.MetaArgs) {
 
 type MetafieldRef = Record<string, unknown> | null | undefined;
 
+/** The image of a file metafield's reference; anything that isn't an image counts as empty. */
+function asImage(reference: MetafieldRef): LpImage | null {
+  return reference && "image" in reference ? (reference.image as LpImage | null) : null;
+}
+
 /** The video of a file metafield's reference; anything that isn't a video counts as empty. */
 function asVideo(reference: MetafieldRef): LpVideo | null {
   return reference && "sources" in reference ? (reference as unknown as LpVideo) : null;
@@ -164,6 +183,7 @@ export async function loader({ context, params }: Route.LoaderArgs) {
       variants: product.variants.nodes,
     },
     clips,
+    whyImage: asImage(product.lpWhyImage?.reference as MetafieldRef),
     christmasActive: Date.now() < CHRISTMAS_CUTOFF,
   };
 }
@@ -268,7 +288,7 @@ function ProductViewedTracker({
 }
 
 export default function LandingPage({ loaderData }: Route.ComponentProps) {
-  const { product, clips, christmasActive } = loaderData;
+  const { product, clips, whyImage, christmasActive } = loaderData;
   const rootData = useRouteLoaderData<typeof rootLoader>("root");
   const paymentMethods = rootData?.shopInfo.paymentMethods ?? [];
 
@@ -321,7 +341,6 @@ export default function LandingPage({ loaderData }: Route.ComponentProps) {
           fromPrice={single ? formatMoney(single.total, single.currencyCode) : null}
           hasClips={clips.some(Boolean)}
         />
-        <WinTip />
         <BuySection
           title={product.title}
           images={product.images}
@@ -334,9 +353,10 @@ export default function LandingPage({ loaderData }: Route.ComponentProps) {
           available={available}
           paymentMethods={paymentMethods}
         />
+        <WinTip />
         <Watch videos={clips} />
         <HowItWorks />
-        <Why />
+        <Why image={whyImage} />
         <Specs />
         <Gift
           duoLabel={duo ? formatMoney(duo.total, duo.currencyCode) : null}
