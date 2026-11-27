@@ -63,6 +63,65 @@ export function LpDefs() {
           <circle cx="4" cy="-7" r="4" fill="none" stroke="#ff5a6a" strokeWidth="2.2" />
           <circle cx="4" cy="7" r="4" fill="none" stroke="#ff5a6a" strokeWidth="2.2" />
         </symbol>
+
+        {/* Bundle picker (reference/bundle.html): small-size projector and mouse with heavier strokes. */}
+        <radialGradient id="holeS" cx="50%" cy="55%" r="60%">
+          <stop offset="0" stopColor="#0d0505" />
+          <stop offset=".6" stopColor="#2a0709" />
+          <stop offset=".82" stopColor="#ff2e43" />
+          <stop offset="1" stopColor="#ff2e43" stopOpacity="0" />
+        </radialGradient>
+        <radialGradient id="haloS">
+          <stop offset="0" stopColor="#ff3b4e" stopOpacity=".5" />
+          <stop offset="1" stopColor="#ff3b4e" stopOpacity="0" />
+        </radialGradient>
+        <radialGradient id="poolS" cx="50%" cy="60%" r="65%">
+          <stop offset="0" stopColor="#ff3b4e" stopOpacity=".3" />
+          <stop offset="1" stopColor="#ff3b4e" stopOpacity="0" />
+        </radialGradient>
+        <linearGradient id="studio" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#f6f1ee" />
+          <stop offset="1" stopColor="#e3dad5" />
+        </linearGradient>
+        <pattern id="planksS" width="80" height="16" patternUnits="userSpaceOnUse">
+          <rect width="80" height="16" fill="#2b1a11" />
+          <rect width="49" height="7.5" fill="#46291b" />
+          <rect x="50" width="30" height="7.5" fill="#3f2619" />
+          <rect y="8" width="22" height="7.5" fill="#432819" />
+          <rect x="23" y="8" width="57" height="7.5" fill="#4a2c1d" />
+        </pattern>
+        <symbol id="devS" viewBox="-80 -110 160 190">
+          <ellipse cx="0" cy="68" rx="60" ry="11" fill="#000" opacity=".35" />
+          <path d="M-46 52h92l-8 14h-76z" fill="#26212a" />
+          <ellipse cx="0" cy="52" rx="46" ry="9" fill="none" stroke="#ff3b4e" strokeWidth="5" />
+          <path d="M-52-40l6-58 34 30zM52-40l-6-58-34 30z" fill="#2e2833" />
+          <path
+            d="M-44-48l4-38 20 18zM44-48l-4-38-20 18z"
+            fill="none"
+            stroke="#ff3b4e"
+            strokeWidth="5"
+            strokeLinejoin="round"
+          />
+          <circle cx="0" cy="-6" r="60" fill="#2e2833" />
+          <circle cx="0" cy="-2" r="41" fill="#17131a" stroke="#ff3b4e" strokeWidth="5" />
+          <g fill="#ff3b4e">
+            <rect x="-26" y="-24" width="9" height="9" />
+            <rect x="17" y="-24" width="9" height="9" />
+          </g>
+          <circle cx="0" cy="14" r="12" fill="#ff3b4e" />
+        </symbol>
+        <symbol id="mouseS" viewBox="-30 -14 60 28" overflow="visible">
+          <ellipse rx="30" ry="22" fill="url(#haloS)" />
+          <path d="M-12 0q-14-2-18-8" fill="none" stroke="#ff6b7a" strokeWidth="3" strokeLinecap="round" />
+          <path
+            d="M-12 0c0-8 10-10 18-6 4 2 8 4 10 6-2 2-6 4-10 6-8 4-18 2-18-6z"
+            fill="rgba(255,59,78,.35)"
+            stroke="#ff6b7a"
+            strokeWidth="3"
+          />
+          <circle cx="4" cy="-7" r="4" fill="none" stroke="#ff6b7a" strokeWidth="2.5" />
+          <circle cx="4" cy="7" r="4" fill="none" stroke="#ff6b7a" strokeWidth="2.5" />
+        </symbol>
       </defs>
     </svg>
   );
@@ -100,7 +159,7 @@ const MICE = [
   { pos: "470,290", dur: "3s", begin: "1.6s", path: "M560 202Q470 240 402 366", keyTimes: "0;.12;.8;.9;1" },
 ];
 
-function useReducedMotion() {
+export function useReducedMotion() {
   const [reduced, setReduced] = useState(false);
   useEffect(() => {
     const query = window.matchMedia("(prefers-reduced-motion: reduce)");

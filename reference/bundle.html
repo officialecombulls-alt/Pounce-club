@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mousehole Bundle Picker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* VOICE everyday shop component: confident, clear, a little playful
+   IDEA picking a bundle switches the lights off: the chosen card becomes the night floor with mice running
+   PICTURE each card holds a small floor scene with 1, 2 or 3 projectors; the picked one glows
+   COLOUR white cards, warm ink, projector red for the choice, night brown for the picked card
+   TYPE Figtree, 800 for prices, 600 labels, 400 text
+   LAYOUT one buy-box column (max 560px): cards, savings ladder, perks, total and button; same order on phones */
+:root{color-scheme:light dark;--bg:light-dark(#f4efec,#120d0b);--card:light-dark(#ffffff,#1c1512);--ink:light-dark(#1f1916,#f3ece8);--soft:light-dark(#665953,#bcaea7);--line:light-dark(#e6ddd8,#382b26);--red:#d7262d;--redd:#b51c22;--night:#22160f;--glow:#ff3b4e;--ok:light-dark(#1d7a45,#62d293)}
+:root[data-theme=light]{color-scheme:light}
+:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);font:16px/1.5 "Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;display:grid;place-items:start center;padding:clamp(20px,5vw,56px) 16px}
+.picker{width:100%;max-width:560px}
+.top{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.top h2{margin:0;font-size:22px;font-weight:800;letter-spacing:-.01em}
+.top span{font-size:14px;color:var(--soft);font-weight:600}
+.cards{display:grid;gap:12px;border:0;margin:0;padding:0}
+.card{position:relative;display:grid;grid-template-columns:132px minmax(0,1fr) auto;gap:16px;align-items:center;padding:12px 18px 12px 12px;border:2px solid var(--line);border-radius:18px;background:var(--card);cursor:pointer;transition:border-color .2s,background .25s,color .25s,transform .2s}
+.card:hover{border-color:var(--soft)}
+.card input{position:absolute;opacity:0;pointer-events:none}
+.card:has(input:focus-visible){outline:3px solid #f0626a;outline-offset:3px}
+.card:has(input:checked){background:var(--night);border-color:var(--red);color:#fbefea;box-shadow:0 10px 28px -12px rgba(215,38,45,.55)}
+.scene{width:132px;height:88px;border-radius:12px;overflow:hidden;background:light-dark(#efe8e4,#2a201c)}
+.scene svg{width:100%;height:100%}
+.scene .night{opacity:0;transition:opacity .3s}
+.card:has(input:checked) .scene .night{opacity:1}
+.card:has(input:checked) .scene .day{opacity:0}
+.scene .day{transition:opacity .3s}
+.name{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-weight:800;font-size:18px;line-height:1.2}
+.tag{font-size:12px;font-weight:800;padding:3px 9px;border-radius:99px;background:light-dark(#1f1916,#f3ece8);color:light-dark(#fff,#1f1916)}
+.tag.red{background:var(--red);color:#fff}
+.card:has(input:checked) .tag{background:#fff;color:#1f1916}
+.card:has(input:checked) .tag.red{background:var(--red);color:#fff}
+.desc{font-size:14px;color:var(--soft);margin-top:3px}
+.card:has(input:checked) .desc{color:#e3cdc5}
+.save{display:inline-block;margin-top:6px;font-size:13px;font-weight:800;color:var(--red)}
+.card:has(input:checked) .save{color:#ff8f97}
+.amt{text-align:right;white-space:nowrap}
+.amt b{display:block;font-size:22px;font-weight:800;letter-spacing:-.01em}
+.amt s{font-size:14px;color:var(--soft)}
+.amt small{display:block;font-size:13px;color:var(--soft);font-weight:600}
+.card:has(input:checked) .amt s,.card:has(input:checked) .amt small{color:#d8bfb6}
+.radio{position:absolute;top:12px;right:12px;width:20px;height:20px;border-radius:50%;border:2px solid var(--line);background:var(--card);display:none}
+/* ladder */
+.ladder{margin-top:20px;padding:16px 18px 14px;border-radius:16px;background:var(--card);border:1px solid var(--line)}
+.lhead{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:14px;font-weight:700}
+.lhead span{color:var(--soft);font-weight:600}
+.track{position:relative;height:10px;margin:20px 10px 8px;border-radius:99px;background:light-dark(#efe7e3,#2c221e)}
+.fill{position:absolute;left:0;top:0;bottom:0;border-radius:99px;background:linear-gradient(90deg,#f07a80,var(--red));transition:width .35s ease}
+.stop{position:absolute;top:50%;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;background:var(--card);border:3px solid light-dark(#e2d7d2,#3d302a);transition:border-color .3s,background .3s}
+.stop.on{border-color:var(--red);background:var(--red)}
+.ticks{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));font-size:13px;margin-top:12px}
+.ticks div:nth-child(2){text-align:center}
+.ticks div:nth-child(3){text-align:right}
+.ticks b{display:block;font-size:15px;font-weight:800}
+.ticks span{color:var(--soft)}
+.nudge{margin-top:12px;font-size:14px;font-weight:600;color:var(--soft);min-height:21px}
+.nudge b{color:var(--red)}
+/* perks */
+.perks{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:8px}
+.perk{display:grid;grid-template-columns:26px minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 12px;border-radius:12px;background:var(--card);border:1px solid var(--line);font-size:15px;font-weight:600;transition:opacity .25s}
+.perk .ic{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--red);color:#fff}
+.perk em{font-style:normal;font-size:13px;color:var(--soft);font-weight:600;white-space:nowrap}
+.perk.locked{opacity:.55}
+.perk.locked .ic{background:light-dark(#e6ddd8,#3a2d27);color:var(--soft)}
+/* total */
+.total{margin-top:18px;display:grid;gap:12px}
+.sum{display:flex;justify-content:space-between;align-items:end;gap:12px}
+.sum b{font-size:28px;font-weight:800;letter-spacing:-.01em;white-space:nowrap}
+.sum span{font-size:14px;color:var(--soft);font-weight:600}
+.sum .you{color:var(--ok);font-weight:700;text-align:right}
+.btn{min-height:58px;border:0;border-radius:14px;background:var(--red);color:#fff;font:800 18px/1 "Figtree",sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px}
+.btn:hover{background:var(--redd)}
+.btn:focus-visible{outline:3px solid #f0626a;outline-offset:3px}
+.meta{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;font-size:13px;color:var(--soft);font-weight:600}
+.meta span{display:inline-flex;align-items:center;gap:6px}
+.draft{margin-top:16px;font-size:13px;color:var(--soft);text-align:center}
+.toast{margin-top:10px;text-align:center;font-weight:700;font-size:14px;color:var(--ok);min-height:21px}
+@media(max-width:480px){.card{grid-template-columns:96px minmax(0,1fr);padding:10px 14px 10px 10px;gap:12px}.scene{width:96px;height:72px}.amt{grid-column:2;text-align:left;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}.amt b{font-size:20px}.name{font-size:16px}.sum b{font-size:24px}}
+@media(prefers-reduced-motion:reduce){.card,.scene .night,.scene .day,.fill,.stop,.perk{transition:none}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <radialGradient id="hole" cx="50%" cy="55%" r="60%"><stop offset="0" stop-color="#0d0505"/><stop offset=".6" stop-color="#2a0709"/><stop offset=".82" stop-color="#ff2e43"/><stop offset="1" stop-color="#ff2e43" stop-opacity="0"/></radialGradient>
+    <radialGradient id="halo"><stop offset="0" stop-color="#ff3b4e" stop-opacity=".5"/><stop offset="1" stop-color="#ff3b4e" stop-opacity="0"/></radialGradient>
+    <radialGradient id="pool" cx="50%" cy="60%" r="65%"><stop offset="0" stop-color="#ff3b4e" stop-opacity=".3"/><stop offset="1" stop-color="#ff3b4e" stop-opacity="0"/></radialGradient>
+    <linearGradient id="studio" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f6f1ee"/><stop offset="1" stop-color="#e3dad5"/></linearGradient>
+    <pattern id="pl" width="80" height="16" patternUnits="userSpaceOnUse"><rect width="80" height="16" fill="#2b1a11"/><rect width="49" height="7.5" fill="#46291b"/><rect x="50" width="30" height="7.5" fill="#3f2619"/><rect y="8" width="22" height="7.5" fill="#432819"/><rect x="23" y="8" width="57" height="7.5" fill="#4a2c1d"/></pattern>
+    <symbol id="dev" viewBox="-80 -110 160 190">
+      <ellipse cx="0" cy="68" rx="60" ry="11" fill="#000" opacity=".35"/>
+      <path d="M-46 52h92l-8 14h-76z" fill="#26212a"/><ellipse cx="0" cy="52" rx="46" ry="9" fill="none" stroke="#ff3b4e" stroke-width="5"/>
+      <path d="M-52-40l6-58 34 30zM52-40l-6-58-34 30z" fill="#2e2833"/><path d="M-44-48l4-38 20 18zM44-48l-4-38-20 18z" fill="none" stroke="#ff3b4e" stroke-width="5" stroke-linejoin="round"/>
+      <circle cx="0" cy="-6" r="60" fill="#2e2833"/>
+      <circle cx="0" cy="-2" r="41" fill="#17131a" stroke="#ff3b4e" stroke-width="5"/>
+      <g fill="#ff3b4e"><rect x="-26" y="-24" width="9" height="9"/><rect x="17" y="-24" width="9" height="9"/></g>
+      <circle cx="0" cy="14" r="12" fill="#ff3b4e"/>
+    </symbol>
+    <symbol id="mouse" viewBox="-30 -14 60 28" overflow="visible">
+      <ellipse rx="30" ry="22" fill="url(#halo)"/>
+      <path d="M-12 0q-14-2-18-8" fill="none" stroke="#ff6b7a" stroke-width="3" stroke-linecap="round"/>
+      <path d="M-12 0c0-8 10-10 18-6 4 2 8 4 10 6-2 2-6 4-10 6-8 4-18 2-18-6z" fill="rgba(255,59,78,.35)" stroke="#ff6b7a" stroke-width="3"/>
+      <circle cx="4" cy="-7" r="4" fill="none" stroke="#ff6b7a" stroke-width="2.5"/><circle cx="4" cy="7" r="4" fill="none" stroke="#ff6b7a" stroke-width="2.5"/>
+    </symbol>
+  </defs>
+</svg>
+
+<section class="picker" aria-labelledby="pickTitle">
+  <div class="top"><h2 id="pickTitle">Choose your bundle</h2><span>Free tracked shipping on all</span></div>
+  <fieldset class="cards" id="cards"><legend class="sr" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Bundle</legend></fieldset>
+
+  <div class="ladder" aria-live="polite">
+    <div class="lhead">Price per projector<span id="pct">Full price</span></div>
+    <div class="track" id="track"><div class="fill" id="fill"></div></div>
+    <div class="ticks" id="ticks"></div>
+    <p class="nudge" id="nudge"></p>
+  </div>
+
+  <ul class="perks" id="perks"></ul>
+
+  <div class="total">
+    <div class="sum"><div><span>Total</span><br><b id="total">$69.99</b></div><span class="you" id="you">You save $9.99</span></div>
+    <button class="btn" id="add" type="button"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l-1.2 12H6.2z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 8V6a3 3 0 0 1 6 0v2" fill="none" stroke="currentColor" stroke-width="2"/></svg><span id="addTxt">Add 2 to cart</span></button>
+    <div class="meta"><span><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z" fill="none" stroke="currentColor" stroke-width="2"/></svg>30-day guarantee</span><span><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 6h12v10H2zM14 10h4l3 3v3h-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span id="eta">Arrives in 6 to 13 business days</span></span></div>
+    <p class="toast" id="toast" role="status"></p>
+  </div>
+  <p class="draft">Draft offer: set your own prices and perks before launch.</p>
+</section>
+
+<script>
+{
+  const $ = id => document.getElementById(id);
+  const usd = n => '$' + n.toFixed(2);
+  const tiers = [
+    {qty:1, name:'1 projector', desc:'For one curious cat', price:39.99, tag:''},
+    {qty:2, name:'2 projectors', desc:'Two rooms, or one to gift', price:69.99, tag:'Great for gifting'},
+    {qty:3, name:'3 projectors', desc:'Multi-cat homes and gift lists', price:94.99, tag:'Best value', red:true}
+  ];
+  const unit = tiers[0].price;
+  const perks = [
+    {txt:'Free tracked shipping', need:1},
+    {txt: q => q >= 2 ? `Save ${Math.round((1 - tiers[q - 1].price / (unit * q)) * 100)}% on every projector` : 'Bundle discount on every projector', need:2},
+    {txt:'Free priority shipping upgrade', need:3}
+  ];
+
+  /* scene for a card: day layer (lights on) and night layer (lights off, mice running) */
+  const scene = (n, k) => {
+    const xs = n === 1 ? [66] : n === 2 ? [40, 92] : [26, 66, 106];
+    const devs = xs.map(x => `<use href="#dev" x="${x - 17}" y="${n === 1 ? 26 : 34}" width="34" height="40"/>`).join('');
+    const big = n === 1 ? `<use href="#dev" x="44" y="12" width="44" height="52"/>` : devs;
+    const holes = [[22, 70], [52, 80], [88, 74], [114, 82], [40, 60], [100, 62], [70, 86]].slice(0, n * 2 + 1)
+      .map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="13" ry="5" fill="url(#halo)"/><ellipse cx="${x}" cy="${y}" rx="7" ry="2.6" fill="url(#hole)"/>`).join('');
+    const paths = ['M22 70Q40 60 52 80', 'M88 74Q102 64 114 82', 'M40 60Q70 52 100 62'].slice(0, n);
+    const mice = paths.map((p, i) => `<g opacity="0"><use href="#mouse" x="-6" y="-3" width="12" height="6"/><animateMotion dur="${2.4 + i * .5}s" begin="${i * .6}s" repeatCount="indefinite" rotate="auto" path="${p}"/><animate attributeName="opacity" dur="${2.4 + i * .5}s" begin="${i * .6}s" repeatCount="indefinite" values="0;1;1;0;0" keyTimes="0;.12;.78;.9;1"/></g>`).join('');
+    return `<svg viewBox="0 0 132 88" aria-hidden="true">
+      <g class="day"><rect width="132" height="88" fill="url(#studio)"/><ellipse cx="66" cy="76" rx="${24 + n * 14}" ry="5" fill="#000" opacity=".1"/>${big}</g>
+      <g class="night"><rect width="132" height="88" fill="url(#pl)"/><rect width="132" height="88" fill="#100806" opacity=".35"/><ellipse cx="66" cy="70" rx="80" ry="34" fill="url(#pool)"/>${holes}${mice}${big}</g>
+    </svg>`;
+  };
+
+  const cards = $('cards');
+  cards.insertAdjacentHTML('beforeend', tiers.map((t, i) => {
+    const save = unit * t.qty - t.price;
+    return `<label class="card"><input type="radio" name="bundle" value="${i}" ${i === 1 ? 'checked' : ''}>
+      <span class="scene">${scene(t.qty, i)}</span>
+      <span><span class="name">${t.name}${t.tag ? `<span class="tag${t.red ? ' red' : ''}">${t.tag}</span>` : ''}</span><span class="desc" style="display:block">${t.desc}</span>${save > .01 ? `<span class="save">You save ${usd(save)}</span>` : ''}</span>
+      <span class="amt"><b>${usd(t.price)}</b>${save > .01 ? `<s>${usd(unit * t.qty)}</s>` : ''}${t.qty > 1 ? `<small>${usd(t.price / t.qty)} each</small>` : '<small>Single</small>'}</span>
+    </label>`;
+  }).join(''));
+
+  /* ladder ticks */
+  $('ticks').innerHTML = tiers.map(t => `<div><b>${usd(t.price / t.qty)}</b><span>${t.qty === 1 ? '1 projector' : t.qty + ' projectors'}</span></div>`).join('');
+  const track = $('track');
+  tiers.forEach((t, i) => track.insertAdjacentHTML('beforeend', `<span class="stop" style="left:${i * 50}%"></span>`));
+  const stops = [...track.querySelectorAll('.stop')];
+
+  const update = () => {
+    const i = +cards.querySelector('input:checked').value, t = tiers[i];
+    const full = unit * t.qty, save = full - t.price, pct = Math.round(save / full * 100);
+    $('fill').style.width = (i * 50) + '%';
+    stops.forEach((s, k) => s.classList.toggle('on', k <= i));
+    $('pct').textContent = pct ? `${pct}% off` : 'Full price';
+    const next = tiers[i + 1];
+    $('nudge').innerHTML = next ? `Add ${next.qty - t.qty} more and pay <b>${usd(next.price / next.qty)}</b> each` : 'You have the lowest price per projector.';
+    $('perks').innerHTML = perks.map(p => {
+      const on = t.qty >= p.need;
+      return `<li class="perk${on ? '' : ' locked'}"><span class="ic" aria-hidden="true">${on ? '<svg width="14" height="14" viewBox="0 0 14 14"><path d="M3 7l3 3 5-6" fill="none" stroke="currentColor" stroke-width="2.2"/></svg>' : '<svg width="12" height="12" viewBox="0 0 12 12"><rect x="2" y="5" width="8" height="6" rx="1.5" fill="currentColor"/><path d="M4 5V4a2 2 0 0 1 4 0v1" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>'}</span><span>${typeof p.txt === 'function' ? p.txt(t.qty) : p.txt}</span><em>${on ? 'Included' : `With ${p.need} projectors`}</em></li>`;
+    }).join('');
+    $('total').textContent = usd(t.price);
+    $('you').textContent = save > .01 ? `You save ${usd(save)}` : 'Shipping included';
+    $('addTxt').textContent = `Add ${t.qty} to cart`;
+    $('toast').textContent = '';
+  };
+  cards.addEventListener('change', update);
+  update();
+
+  /* delivery estimate */
+  const addBiz = (d, n) => { const x = new Date(d); while (n > 0) { x.setDate(x.getDate() + 1); const w = x.getDay(); if (w && w < 6) n--; } return x; };
+  const fmt = d => d.toLocaleDateString('en-US', {month:'short', day:'numeric'});
+  const today = new Date();
+  $('eta').textContent = `Arrives ${fmt(addBiz(today, 6))} to ${fmt(addBiz(today, 13))}`;
+
+  $('add').addEventListener('click', () => { const t = tiers[+cards.querySelector('input:checked').value]; $('toast').textContent = `Added ${t.name} to your cart.`; });
+
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) document.querySelectorAll('animate, animateMotion').forEach(a => { const g = a.parentNode; a.remove(); const m = (g.querySelector('use') && g.dataset.p) || ''; g.setAttribute('opacity', m ? '1' : '0'); });
+}
+</script>
+</body>
+</html>

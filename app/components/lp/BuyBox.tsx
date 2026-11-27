@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { shopifyImageUrl, srcSetForWidths } from "~/lib/image";
-import { DELIVERY_TIME, GUARANTEE_DAYS, HANDLING_TIME } from "~/lib/lp-config";
 
-import { type BundleOffer, formatMoney, projectorCount } from "./bundles";
+import { type BundleOffer, formatMoney } from "./bundles";
+import { BundlePicker } from "./BundlePicker";
 
 export type LpImage = {
   url: string;
@@ -16,12 +16,6 @@ export type LpImage = {
 export function buyLabel(offer: BundleOffer | undefined, pending: boolean, prefix = "Buy now, ") {
   if (pending) return "Opening checkout…";
   return offer ? `${prefix}${formatMoney(offer.total, offer.currencyCode)}` : "Sold out";
-}
-
-/** "card, Apple Pay or Shop Pay" style list. */
-function joinOr(items: string[]) {
-  if (items.length <= 1) return items.join("");
-  return `${items.slice(0, -1).join(", ")} or ${items[items.length - 1]}`;
 }
 
 const STAGE_WIDTHS = [400, 600, 800, 1000, 1200];
@@ -132,11 +126,6 @@ export function BuySection({
   available: boolean;
   paymentMethods: string[];
 }) {
-  const submit = (event: FormEvent) => {
-    event.preventDefault();
-    onBuy();
-  };
-
   return (
     <section className="band" id="buy">
       <div className="wrap buy">
@@ -147,68 +136,16 @@ export function BuySection({
             A 6.3-inch cat head that sits on the floor and projects glowing mice popping in and out of mouse holes.
             Get one for your cat, or one to keep and one to give.
           </p>
-          <form onSubmit={submit}>
-            <fieldset className="opts">
-              <legend className="note">Pick how many</legend>
-              {offers.map((offer) => (
-                <label className="opt" key={offer.quantity}>
-                  <input
-                    type="radio"
-                    name="bundle"
-                    value={offer.quantity}
-                    checked={selected?.quantity === offer.quantity}
-                    onChange={() => onSelect(offer.quantity)}
-                  />
-                  <div>
-                    <b>
-                      {projectorCount(offer.quantity)}
-                      {offer.tag ? <em className="tag">{offer.tag}</em> : null}
-                    </b>
-                    <span>
-                      {offer.note}
-                      {offer.saving > 0 ? `, save ${formatMoney(offer.saving, offer.currencyCode)}` : null}
-                    </span>
-                  </div>
-                  <div className="pr">
-                    {formatMoney(offer.total, offer.currencyCode)}
-                    {offer.saving > 0 ? <s>{formatMoney(offer.regularTotal, offer.currencyCode)}</s> : null}
-                  </div>
-                </label>
-              ))}
-            </fieldset>
-            <button
-              className="btn add"
-              id="buy-button"
-              type="submit"
-              disabled={pending || !available || !selected}
-              aria-busy={pending || undefined}
-            >
-              {available ? buyLabel(selected, pending) : "Sold out"}
-            </button>
-            {error ? (
-              <p className="buyError" role="alert">
-                {error}
-              </p>
-            ) : null}
-          </form>
-          <ul className="facts">
-            {/* One span per line: each li is a flex row (dot + text). */}
-            <li>
-              <span>
-                Ships in {HANDLING_TIME}, then arrives in {DELIVERY_TIME} with tracking. Free on US orders.
-              </span>
-            </li>
-            <li>
-              <span>
-                {GUARANTEE_DAYS}-day money-back guarantee. <a href="/policies/refund-policy">See how it works</a>.
-              </span>
-            </li>
-            {paymentMethods.length ? (
-              <li>
-                <span>Pay with {joinOr(paymentMethods)}.</span>
-              </li>
-            ) : null}
-          </ul>
+          <BundlePicker
+            offers={offers}
+            selected={selected}
+            onSelect={onSelect}
+            onBuy={onBuy}
+            pending={pending}
+            error={error}
+            available={available}
+            paymentMethods={paymentMethods}
+          />
         </div>
       </div>
     </section>

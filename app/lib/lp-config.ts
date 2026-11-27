@@ -29,6 +29,8 @@ export const GUARANTEE_DAYS = 45;
 /** Order handling and US delivery times. Must match Settings → Shipping and the Shipping policy. */
 export const HANDLING_TIME = "1 to 3 days";
 export const DELIVERY_TIME = "5 to 10 business days";
+/** Order-to-door window in business days (handling + delivery), for the bundle picker's "Arrives …" dates. */
+export const ARRIVAL_BUSINESS_DAYS: [number, number] = [6, 13];
 
 /**
  * Christmas delivery cutoff: orders placed before the end of Mon Dec 8 (US Eastern)
@@ -56,16 +58,18 @@ export function redirectToLandingPage(request: Request) {
 export type BundleTier = {
   /** Projectors in the pack. */
   quantity: number;
-  /** Line under the pack name, e.g. "One to keep, one to gift". */
+  /** Line under the pack name, e.g. "Two rooms, or one to gift". */
   note: string;
-  /** Red pill next to the pack name, e.g. "Gift pick". */
+  /** Pill next to the pack name, e.g. "Best value". */
   tag?: string;
+  /** Red pill instead of the dark one. */
+  tagRed?: boolean;
   /** Money off each projector, in the store currency (mirror of the Shopify automatic discount). */
   discountPerUnit: number;
 };
 
 /**
- * Pack options for the "Pick how many" picker.
+ * Pack options for the "Choose your bundle" picker.
  *
  * Prices are never set here: each projector costs the product's Shopify price,
  * and the crossed-out price is its compare-at price. `discountPerUnit` only
@@ -79,10 +83,10 @@ export type BundleTier = {
  * If you change an amount here, change the Shopify discount too (and vice versa).
  */
 export const BUNDLE_TIERS: BundleTier[] = [
-  { quantity: 1, note: "For your cat", discountPerUnit: 0 },
-  { quantity: 2, note: "One to keep, one to gift", tag: "Gift pick", discountPerUnit: 5 },
-  { quantity: 3, note: "For multi-cat or multi-room homes", discountPerUnit: 10 },
+  { quantity: 1, note: "For one curious cat", discountPerUnit: 0 },
+  { quantity: 2, note: "Two rooms, or one to gift", tag: "Great for gifting", discountPerUnit: 5 },
+  { quantity: 3, note: "Multi-cat homes and gift lists", tag: "Best value", tagRed: true, discountPerUnit: 10 },
 ];
 
 /** Pack selected when the page loads. */
-export const DEFAULT_BUNDLE_QUANTITY = 1;
+export const DEFAULT_BUNDLE_QUANTITY = 2;
