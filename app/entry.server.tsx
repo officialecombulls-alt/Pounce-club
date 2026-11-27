@@ -5,6 +5,7 @@ import { ServerRouter, type EntryContext, type RouterContextProvider } from "rea
 
 import { NonceProvider } from "~/lib/csp";
 import { envContext } from "~/lib/env";
+import { SHOP_MEDIA_DOMAIN } from "~/lib/lp-config";
 import { getMockShopDomain, getStoreDomain, shouldUseMockShop } from "~/lib/shop";
 
 export default async function handleRequest(
@@ -16,10 +17,19 @@ export default async function handleRequest(
 ) {
   const env = context.get(envContext);
 
+  // Shopify serves uploaded videos from the Online Store's primary domain
+  // (https://checkout.pounceclub.store/cdn/shop/videos/…), not cdn.shopify.com,
+  // so the landing page's clips need that origin in media-src.
+  const mediaDomains = [SHOP_MEDIA_DOMAIN, env.PUBLIC_CHECKOUT_DOMAIN].filter(
+    (domain, index, all): domain is string => Boolean(domain) && all.indexOf(domain) === index,
+  );
   const csp = createContentSecurityPolicy({
     shop: {
       storeDomain: shouldUseMockShop(env) ? getMockShopDomain(env) : getStoreDomain(env),
       checkoutDomain: env.PUBLIC_CHECKOUT_DOMAIN,
+    },
+    directives: {
+      mediaSrc: mediaDomains.map((domain) => (domain.startsWith("https://") ? domain : `https://${domain}`)),
     },
   });
 

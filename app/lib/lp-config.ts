@@ -23,6 +23,14 @@ export const PRODUCT_SHORT_NAME = "MouseDash";
  */
 export const LP_PRODUCT_HANDLE = "mousedash-floor-projector-for-cats";
 
+/**
+ * The Online Store's primary domain (also the checkout domain). Shopify serves
+ * uploaded videos from https://<this domain>/cdn/shop/videos/…, so the page's
+ * Content Security Policy must allow it as a media source (app/entry.server.tsx).
+ * If the Online Store's primary domain changes, change this too.
+ */
+export const SHOP_MEDIA_DOMAIN = "checkout.pounceclub.store";
+
 /** Money-back guarantee, in days. Must match the Refund policy in Shopify. */
 export const GUARANTEE_DAYS = 45;
 
