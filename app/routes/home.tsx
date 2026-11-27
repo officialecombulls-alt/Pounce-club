@@ -9,6 +9,7 @@ import {
 import { HomeHero } from "~/components/HomeHero";
 import { ProductCard, PRODUCT_CARD_FRAGMENT, type ProductCardData } from "~/components/ProductCard";
 import { selectHomeHero } from "~/lib/home-hero";
+import { HOME_IS_LANDING_PAGE, redirectToLandingPage } from "~/lib/lp-config";
 import { storefrontClientContext } from "~/lib/storefront";
 import {
   FALLBACK_SHOP_NAME,
@@ -67,7 +68,9 @@ export function meta({ matches }: Route.MetaArgs) {
   ];
 }
 
-export async function loader({ context }: Route.LoaderArgs) {
+export async function loader({ context, request }: Route.LoaderArgs) {
+  if (HOME_IS_LANDING_PAGE) throw redirectToLandingPage(request);
+
   const storefrontClient = context.get(storefrontClientContext);
   const { data } = await storefrontClient.graphql(HOME_QUERY);
 

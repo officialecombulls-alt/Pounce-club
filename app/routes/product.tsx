@@ -13,6 +13,7 @@ import { Link, useLocation, useNavigate } from "react-router";
 import { ProductCard, PRODUCT_CARD_FRAGMENT } from "~/components/ProductCard";
 import { openCartDrawer } from "~/lib/cart-drawer";
 import { formatPrice, salePercent } from "~/lib/money";
+import { LP_PRODUCT_HANDLE, redirectToLandingPage } from "~/lib/lp-config";
 import { ProductProvider, useProductForm } from "~/lib/product";
 import { storefrontClientContext } from "~/lib/storefront";
 import { formatPageTitle, getShopNameFromRootMatch } from "~/lib/storefront-shop";
@@ -147,6 +148,8 @@ export function meta({ matches }: Route.MetaArgs) {
 export async function loader({ context, params, request }: Route.LoaderArgs) {
   const handle = params.handle;
   if (!handle) throw new Response("Not Found", { status: 404 });
+  // This product sells through its landing page.
+  if (handle === LP_PRODUCT_HANDLE) throw redirectToLandingPage(request);
 
   const storefrontClient = context.get(storefrontClientContext);
   const selectedOptions = getSelectedProductOptions({

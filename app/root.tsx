@@ -8,6 +8,7 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useMatches,
   useNavigate,
   useRouteLoaderData,
 } from "react-router";
@@ -145,15 +146,24 @@ export function Layout({ children }: { children: ReactNode }) {
   );
 }
 
+/** Routes that render their own header and footer (landing pages) set `handle: { storeChrome: false }`. */
+function useStoreChrome(): boolean {
+  const matches = useMatches();
+  return !matches.some(
+    (match) => (match.handle as { storeChrome?: boolean } | undefined)?.storeChrome === false,
+  );
+}
+
 export default function App({ loaderData }: Route.ComponentProps) {
+  const storeChrome = useStoreChrome();
   return (
     <CartProvider initialData={loaderData.cartData}>
       <PageViewedTracker />
       <CartAnalyticsTracker />
-      <AnnouncementBar />
-      <Header shopInfo={loaderData.shopInfo} />
+      {storeChrome ? <AnnouncementBar /> : null}
+      {storeChrome ? <Header shopInfo={loaderData.shopInfo} /> : null}
       <Outlet />
-      <Footer shopInfo={loaderData.shopInfo} />
+      {storeChrome ? <Footer shopInfo={loaderData.shopInfo} /> : null}
       <CartDrawer />
       <SearchDrawer />
     </CartProvider>
