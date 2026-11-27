@@ -14,7 +14,7 @@ export const BRAND = {
   contactEmail: "contact@pounceclub.store",
 };
 
-/** Short product name for the promo bar and sticky bar ("MouseDash"). */
+/** Short product name for headings, the sticky bar and the promo copy ("MouseDash"). */
 export const PRODUCT_SHORT_NAME = "MouseDash";
 
 /**
@@ -23,8 +23,20 @@ export const PRODUCT_SHORT_NAME = "MouseDash";
  */
 export const LP_PRODUCT_HANDLE = "mousedash-floor-projector-for-cats";
 
-/** Money-back guarantee, in days (FAQ, contact page). Must match the Refund policy in Shopify. */
+/** Money-back guarantee, in days. Must match the Refund policy in Shopify. */
 export const GUARANTEE_DAYS = 45;
+
+/** Order handling and US delivery times. Must match Settings → Shipping and the Shipping policy. */
+export const HANDLING_TIME = "1 to 3 days";
+export const DELIVERY_TIME = "5 to 10 business days";
+
+/**
+ * Christmas delivery cutoff: orders placed before the end of Mon Dec 8 (US Eastern)
+ * arrive before Christmas. After it, the promo bar, gift-section date card and the
+ * FAQ line drop the Christmas wording by themselves.
+ */
+export const CHRISTMAS_CUTOFF = new Date("2026-12-09T04:59:59Z").getTime();
+export const CHRISTMAS_CUTOFF_LABEL = "Dec 8";
 
 /** While true, the homepage (/) redirects to the landing page. Set false to bring the store homepage back. */
 export const HOME_IS_LANDING_PAGE: boolean = true;
@@ -44,31 +56,32 @@ export function redirectToLandingPage(request: Request) {
 export type BundleTier = {
   /** Projectors in the pack. */
   quantity: number;
-  /** "Single", "Duo", "Trio" (shown as "Duo pack"). */
-  name: string;
-  /** Sticky-bar note, e.g. "Two projectors". */
+  /** Line under the pack name, e.g. "One to keep, one to gift". */
   note: string;
+  /** Red pill next to the pack name, e.g. "Gift pick". */
+  tag?: string;
   /** Money off each projector, in the store currency (mirror of the Shopify automatic discount). */
   discountPerUnit: number;
 };
 
 /**
- * Pack options for the "Choose your pack" picker.
+ * Pack options for the "Pick how many" picker.
  *
- * Prices are never set here: each projector costs the variant's Storefront API
- * price. `discountPerUnit` only DISPLAYS the pack saving; Shopify charges it at
- * checkout through automatic discounts, which must match exactly:
+ * Prices are never set here: each projector costs the product's Shopify price,
+ * and the crossed-out price is its compare-at price. `discountPerUnit` only
+ * DISPLAYS the pack price; Shopify charges it at checkout through automatic
+ * discounts, which must match exactly:
  *   Discounts → Create discount → Amount off products → Automatic discount,
- *   "Fixed amount" per item, minimum quantity of items, applies to MouseDash:
- *     • "MouseDash Duo"  minimum 2 items → $5.00 off each
- *     • "MouseDash Trio" minimum 3 items → $10.00 off each
- * At $39.99 each that makes Duo $69.98 (save $10) and Trio $89.97 (save $30).
+ *   "Fixed amount", applied to each eligible item, minimum quantity of items,
+ *   applies to MouseDash:
+ *     • "MouseDash 2-pack"  minimum 2 items → $5.00 off each
+ *     • "MouseDash 3-pack"  minimum 3 items → $10.00 off each
  * If you change an amount here, change the Shopify discount too (and vice versa).
  */
 export const BUNDLE_TIERS: BundleTier[] = [
-  { quantity: 1, name: "Single", note: "One projector", discountPerUnit: 0 },
-  { quantity: 2, name: "Duo", note: "Two projectors", discountPerUnit: 5 },
-  { quantity: 3, name: "Trio", note: "Three projectors", discountPerUnit: 10 },
+  { quantity: 1, note: "For your cat", discountPerUnit: 0 },
+  { quantity: 2, note: "One to keep, one to gift", tag: "Gift pick", discountPerUnit: 5 },
+  { quantity: 3, note: "For multi-cat or multi-room homes", discountPerUnit: 10 },
 ];
 
 /** Pack selected when the page loads. */

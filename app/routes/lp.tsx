@@ -1,16 +1,33 @@
 import { AnalyticsEvent, gql } from "@shopify/hydrogen";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { data as dataResponse, redirect } from "react-router";
+import { data as dataResponse, redirect, useRouteLoaderData } from "react-router";
 
-import { bundleOffers, formatSaving } from "~/components/lp/bundles";
-import { buyLabel, BuyBox } from "~/components/lp/BuyBox";
-import { Gallery } from "~/components/lp/Gallery";
-import { LpFooter, LpHeader, LpPromo, StickyBar } from "~/components/lp/LpChrome";
-import type { LpImage, LpMediaSlot, LpVideo } from "~/components/lp/LpMedia";
-import { Demo, Faq, Intro, Kit, Setup } from "~/components/lp/LpSections";
+import { bundleOffers, formatMoney, projectorCount } from "~/components/lp/bundles";
+import { BuySection, buyLabel } from "~/components/lp/BuyBox";
+import { LpDefs } from "~/components/lp/LpArt";
+import { LpFooter, LpNav, LpStrip, StickyBar } from "~/components/lp/LpChrome";
+import {
+  CareAndFaq,
+  Closing,
+  Compare,
+  Gift,
+  Hero,
+  HowItWorks,
+  type LpVideo,
+  Watch,
+  Why,
+} from "~/components/lp/LpSections";
 import { type LpCartLine, type LpVariant, useLpCheckout } from "~/components/lp/useLpCheckout";
-import { BRAND, BUNDLE_TIERS, DEFAULT_BUNDLE_QUANTITY, PRODUCT_SHORT_NAME } from "~/lib/lp-config";
+import {
+  BRAND,
+  BUNDLE_TIERS,
+  CHRISTMAS_CUTOFF,
+  CHRISTMAS_CUTOFF_LABEL,
+  DEFAULT_BUNDLE_QUANTITY,
+  PRODUCT_SHORT_NAME,
+} from "~/lib/lp-config";
 import { storefrontClientContext } from "~/lib/storefront";
+import type { loader as rootLoader } from "~/root";
 import lpStylesHref from "~/styles/lp.css?url";
 
 import type { Route } from "./+types/lp";
@@ -23,42 +40,26 @@ const LP_PRODUCT_QUERY = gql(`
       title
       vendor
       description
-      featuredImage {
-        url
-        altText
-        width
-        height
+      images(first: 10) {
+        nodes {
+          url
+          altText
+          width
+          height
+        }
       }
-      # Landing-page media, uploaded on the product in Shopify admin
-      # (Products → MouseDash → Metafields). Empty slots show the design's placeholder.
-      lpChaseVideo: metafield(namespace: "custom", key: "lp_chase_video") {
+      # Up to 4 vertical clips for "Watch real cats hunt", uploaded on the product
+      # in Shopify admin (Products → MouseDash → Metafields). Empty slots keep the
+      # design's illustrated frame. Queried both ways so "One file" and "List of
+      # files" definitions both work.
+      lpClipVideos: metafield(namespace: "custom", key: "lp_clip_videos") {
         reference {
-          ... on Video {
-            alt
-            sources {
-              url
-              mimeType
-              height
-            }
-            previewImage {
-              url
-            }
+          ...LpVideo
+        }
+        references(first: 4) {
+          nodes {
+            ...LpVideo
           }
-        }
-      }
-      lpProjectionImage: metafield(namespace: "custom", key: "lp_projection_image") {
-        reference {
-          ...LpMetafieldImage
-        }
-      }
-      lpRoomImage: metafield(namespace: "custom", key: "lp_room_image") {
-        reference {
-          ...LpMetafieldImage
-        }
-      }
-      lpKitImage: metafield(namespace: "custom", key: "lp_kit_image") {
-        reference {
-          ...LpMetafieldImage
         }
       }
       priceRange {
@@ -85,12 +86,15 @@ const LP_PRODUCT_QUERY = gql(`
       }
     }
   }
-  fragment LpMetafieldImage on MediaImage {
-    image {
+  fragment LpVideo on Video {
+    alt
+    sources {
       url
-      altText
-      width
+      mimeType
       height
+    }
+    previewImage {
+      url
     }
   }
 `);
@@ -100,13 +104,9 @@ export const handle = { storeChrome: false };
 
 export const links: Route.LinksFunction = () => [
   { rel: "stylesheet", href: lpStylesHref },
-  {
-    rel: "preload",
-    href: "/fonts/inter-latin.woff2",
-    as: "font",
-    type: "font/woff2",
-    crossOrigin: "anonymous",
-  },
+  // Above-the-fold fonts: the hero title and its text.
+  { rel: "preload", href: "/fonts/lilita-one-latin.woff2", as: "font", type: "font/woff2", crossOrigin: "anonymous" },
+  { rel: "preload", href: "/fonts/nunito-sans-latin.woff2", as: "font", type: "font/woff2", crossOrigin: "anonymous" },
 ];
 
 export function meta({ data }: Route.MetaArgs) {
@@ -117,20 +117,15 @@ export function meta({ data }: Route.MetaArgs) {
       name: "description",
       content:
         data.product.description?.slice(0, 160) ||
-        "Little mice dart between projected holes on your floor. Your cat picks the next pounce.",
+        "Glowing mice dart out of glowing holes across your floor, and your cat does the rest.",
     },
   ];
 }
 
 type MetafieldRef = Record<string, unknown> | null | undefined;
 
-/** The image of a file metafield's reference; anything that isn't an image counts as empty. */
-function metafieldImage(reference: MetafieldRef): LpImage | null {
-  return reference && "image" in reference ? (reference.image as LpImage | null) : null;
-}
-
 /** The video of a file metafield's reference; anything that isn't a video counts as empty. */
-function metafieldVideo(reference: MetafieldRef): LpVideo | null {
+function asVideo(reference: MetafieldRef): LpVideo | null {
   return reference && "sources" in reference ? (reference as unknown as LpVideo) : null;
 }
 
@@ -148,45 +143,10 @@ export async function loader({ context, params }: Route.LoaderArgs) {
   if (!data?.product) throw new Response("Not Found", { status: 404 });
 
   const { product } = data;
-  const name = PRODUCT_SHORT_NAME;
-  // The design's five media slots. The gallery shows all five; the sections reuse four.
-  const media: Record<string, LpMediaSlot> = {
-    product: {
-      slot: "product",
-      label: `${name} projector`,
-      kind: "Product photo",
-      tag: "Photo",
-      image: product.featuredImage,
-    },
-    chase: {
-      slot: "chase",
-      label: "Cat chasing the projection",
-      kind: "Demo video",
-      tag: "Video",
-      video: metafieldVideo(product.lpChaseVideo?.reference),
-    },
-    detail: {
-      slot: "detail",
-      label: "Mouse pattern on the floor",
-      kind: "Projection close-up",
-      tag: "Photo",
-      image: metafieldImage(product.lpProjectionImage?.reference),
-    },
-    room: {
-      slot: "room",
-      label: "Projector placement on the floor",
-      kind: "Room setup photo",
-      tag: "Room view",
-      image: metafieldImage(product.lpRoomImage?.reference),
-    },
-    kit: {
-      slot: "kit",
-      label: "Projector and cable, laid out together",
-      kind: "Box contents photo",
-      tag: "Kit photo",
-      image: metafieldImage(product.lpKitImage?.reference),
-    },
-  };
+  const clipField = product.lpClipVideos;
+  const clips = clipField?.references
+    ? clipField.references.nodes.map((node) => asVideo(node as MetafieldRef))
+    : [asVideo(clipField?.reference as MetafieldRef)];
 
   return {
     product: {
@@ -194,10 +154,12 @@ export async function loader({ context, params }: Route.LoaderArgs) {
       title: product.title,
       vendor: product.vendor,
       description: product.description,
+      images: product.images.nodes,
       priceRange: product.priceRange,
       variants: product.variants.nodes,
     },
-    media,
+    clips,
+    christmasActive: Date.now() < CHRISTMAS_CUTOFF,
   };
 }
 
@@ -272,7 +234,13 @@ export async function action({ context, request }: Route.ActionArgs) {
 type LpProduct = Route.ComponentProps["loaderData"]["product"];
 
 /** Same PRODUCT_VIEWED payload the PDP publishes (routes/product.tsx). */
-function ProductViewedTracker({ product, variant }: { product: LpProduct; variant: LpProduct["variants"][number] | undefined }) {
+function ProductViewedTracker({
+  product,
+  variant,
+}: {
+  product: LpProduct;
+  variant: LpProduct["variants"][number] | undefined;
+}) {
   useEffect(() => {
     window.Shopify?.analytics?.publish(AnalyticsEvent.PRODUCT_VIEWED, {
       products: [
@@ -293,7 +261,9 @@ function ProductViewedTracker({ product, variant }: { product: LpProduct; varian
 }
 
 export default function LandingPage({ loaderData }: Route.ComponentProps) {
-  const { product, media } = loaderData;
+  const { product, clips, christmasActive } = loaderData;
+  const rootData = useRouteLoaderData<typeof rootLoader>("root");
+  const paymentMethods = rootData?.shopInfo.paymentMethods ?? [];
 
   // Packs are quantities of the first available variant; Shopify automatic
   // discounts charge the pack price at checkout (see BUNDLE_TIERS).
@@ -312,15 +282,8 @@ export default function LandingPage({ loaderData }: Route.ComponentProps) {
     [variantNode],
   );
   const offers = useMemo(() => (variant ? bundleOffers(BUNDLE_TIERS, variant) : []), [variant]);
-
-  // "Save up to $30 on MouseDash bundles", from Shopify prices (no hard-coded amount).
-  const best = offers.reduce<(typeof offers)[number] | null>(
-    (top, offer) => (offer.saving > (top?.saving ?? 0) ? offer : top),
-    null,
-  );
-  const promo = best
-    ? `Save up to ${formatSaving(best.saving, best.currencyCode)} on ${PRODUCT_SHORT_NAME} bundles`
-    : null;
+  const single = offers.find((offer) => offer.quantity === 1) ?? offers[0];
+  const duo = offers.find((offer) => offer.quantity === 2);
 
   const [quantity, setQuantity] = useState(DEFAULT_BUNDLE_QUANTITY);
   const selected = offers.find((offer) => offer.quantity === quantity) ?? offers[0];
@@ -336,49 +299,54 @@ export default function LandingPage({ loaderData }: Route.ComponentProps) {
   const { checkout, pending, error } = useLpCheckout();
   const buy = useCallback(() => checkout(lines), [checkout, lines]);
 
-  const views = [media.product, media.chase, media.detail, media.room, media.kit];
+  const strip = christmasActive
+    ? `Free tracked US shipping. Order by ${CHRISTMAS_CUTOFF_LABEL} to get it before Christmas.`
+    : "Free tracked shipping on every US order.";
 
   return (
     <div className="lp" id="top">
       <ProductViewedTracker product={product} variant={variantNode} />
-      <a className="skip" href="#shop">
-        Skip to purchase options
-      </a>
-      <LpPromo text={promo} href="#shop" />
-      <LpHeader />
+      <LpDefs />
+      <LpStrip text={strip} />
+      <LpNav />
       <main id="main-content" tabIndex={-1}>
-        <section id="product">
-          <div className="wrap">
-            <Intro />
-            <div className="pdp">
-              <Gallery views={views} />
-              <BuyBox
-                title={product.title}
-                offers={offers}
-                selected={selected}
-                onSelect={setQuantity}
-                onBuy={buy}
-                pending={pending}
-                error={error}
-                available={available}
-              />
-            </div>
-          </div>
-        </section>
-        <Demo chase={media.chase} detail={media.detail} />
-        <Setup room={media.room} />
-        <Kit kit={media.kit} />
-        <Faq />
+        <Hero
+          fromPrice={single ? formatMoney(single.total, single.currencyCode) : null}
+          hasClips={clips.some(Boolean)}
+        />
+        <BuySection
+          title={product.title}
+          images={product.images}
+          offers={offers}
+          selected={selected}
+          onSelect={setQuantity}
+          onBuy={buy}
+          pending={pending}
+          error={error}
+          available={available}
+          paymentMethods={paymentMethods}
+        />
+        <Watch videos={clips} />
+        <HowItWorks />
+        <Why />
+        <Compare />
+        <Gift
+          duoLabel={duo ? formatMoney(duo.total, duo.currencyCode) : null}
+          onPickTwo={() => duo && setQuantity(2)}
+          showCutoff={christmasActive}
+        />
+        <CareAndFaq showCutoff={christmasActive} />
+        <Closing />
       </main>
+      <LpFooter />
       <StickyBar
-        name={PRODUCT_SHORT_NAME}
-        packLabel={selected ? `${selected.name} pack · ${selected.note}` : ""}
-        buttonLabel={available ? buyLabel(selected, pending) : "Sold out"}
+        name={`${PRODUCT_SHORT_NAME} projector`}
+        packLabel={selected ? projectorCount(selected.quantity) : ""}
+        buttonLabel={available ? buyLabel(selected, pending, "") : "Sold out"}
         onBuy={buy}
         disabled={!lines.length}
         pending={pending}
       />
-      <LpFooter />
     </div>
   );
 }

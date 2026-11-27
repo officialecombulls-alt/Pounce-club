@@ -35,11 +35,11 @@ export default function ContactRoute({ loaderData }: Route.ComponentProps) {
       </p>
 
       <div className="contact-card">
-        <span className="category">Email us</span>
+        <span className="note">Email us</span>
         <a className="contact-email" href={`mailto:${email}`}>
           {email}
         </a>
-        <a className="cta contact-btn" href={`mailto:${email}`}>
+        <a className="btn contact-btn" href={`mailto:${email}`}>
           Send an email
         </a>
       </div>

@@ -4,94 +4,85 @@ Everything the landing page needs that only you can set up in Shopify admin.
 Every key and amount below is copied from the code (`app/routes/lp.tsx` and
 `app/lib/lp-config.ts`). If you change one in Shopify, it has to change in the code too.
 
-**What updates by itself** once it's saved in Shopify: price, compare-at price,
-product title, product photo, the 4 section images and the video, and the policies.
+**What updates by itself** once it's saved in Shopify: price, compare-at price, product
+title, product photos, the 4 clip videos, the payment methods line and the policies.
 **What needs a code change:** wording on the page, the pack discounts shown on the page,
-layout and new sections.
+delivery times, the Christmas date, layout and new sections.
 
 ---
 
-## 0. Fix these first (found on the live site, 27 Nov 2026)
-1. **Prices show in NPR, not USD.** The page asks Shopify for United States prices, but they come back as
-   "NPR 39.00", so the store's currency is Nepalese rupees. To sell at $39.99 in the US, either:
-   - **Settings → General → Store defaults → Currency display: change the store currency to USD** (only possible before the first sale; simplest if you sell only in the US), then set the price to `39.99`; or
-   - **Settings → Markets → add a "United States" market** with currency **USD**, and set a **fixed US price** of $39.99 on the product (Markets → United States → Products and pricing).
-   The pack discounts ($5 and $10 off each) are in the store currency too, so they only work out once prices are in USD.
+## 0. Still open on the live site (checked 27 Nov 2026)
+1. ~~Prices in NPR~~: **fixed**, the live page now shows USD ($39.00, compare-at $65.00).
 2. **The product shows "Sold out".** Open the product and check:
    - **Inventory:** "Track quantity" is on with 0 in stock. Add stock, or untick "Track quantity", or tick "Continue selling when out of stock".
    - **Markets:** the product is included in the United States market.
    - **Sales channels:** the Hydrogen storefront is ticked.
-3. **`www.pounceclub.store` goes to the checkout domain.** In **Sales channels → Hydrogen → Pounce Club → Storefront settings → Domains**, add `www.pounceclub.store` to **Production** too. `pounceclub.store` already works, and `checkout.pounceclub.store` is right as the Online Store's primary domain.
+3. **`www.pounceclub.store` goes to the checkout domain.** In **Sales channels → Hydrogen → Pounce Club → Storefront settings → Domains**, add `www.pounceclub.store` to **Production** too.
+4. **Refund, Shipping and Terms policies aren't saved**, so those footer links show "not found". Paste them from `docs/policies.md`.
 
 ## 1. Store basics
 1. **Online Store → Preferences → Password protection:** off. While it's on, checkout sends buyers to the password page.
-2. **Settings → Payments:** a payment provider is active. Without one, checkout says "This store can't accept payments right now".
+2. **Settings → Payments:** a payment provider is active. The page's "Pay with …" line lists the cards and wallets Shopify reports, and hides itself if there are none.
 3. **Settings → Store details:** business name and address are correct (checkout and emails show them).
 
 ## 2. The MouseDash product
-**Products → MouseDash Cat Projector:**
-1. **Title:** `MouseDash Cat Projector` (shown as the big heading next to the gallery).
-2. **Price:** `39.99`. **Compare-at price:** leave empty unless the regular price really is higher. When it's set, the page shows it crossed out on every pack.
-3. **Shipping:** tick **"This is a physical product"** and enter the packed weight. Without this, checkout only asks for a billing address and charges no shipping.
-4. **Handle** (Search engine listing → URL handle): `mousedash-floor-projector-for-cats`. It has to match `LP_PRODUCT_HANDLE` in `app/lib/lp-config.ts`. Don't change it without telling me, or the homepage breaks.
-5. **Media:** the **first** product image is the "Product" view in the gallery and the first thing people see. Frames are light grey (`#efefef`) and photos are shown whole, not cropped, so a photo on a light grey or transparent background blends in best. Use landscape, at least 1400 px wide.
-6. **Sales channels:** make sure the product is available on the Hydrogen storefront.
+**Products → MOUSEDASH Floor Projector for Cats:**
+1. **Title** is the big heading in the buy section. It's currently all caps ("MOUSEDASH Floor Projector for Cats"); change it to "MouseDash Floor Projector for Cats" if you prefer. No code change is needed.
+2. **Price** and **Compare-at price:** every price on the page comes from these. With compare-at $65 and price $39, every pack shows the $65-each price crossed out. Only use a compare-at price you have really charged.
+3. **Shipping:** tick **"This is a physical product"** and enter the packed weight. Without this, checkout only asks for a billing address.
+4. **Handle:** `mousedash-floor-projector-for-cats`. It has to match `LP_PRODUCT_HANDLE`. Don't change it without telling me, or the homepage breaks.
+5. **Media:** all product photos appear in the buy section's dark rounded frame, cropped to fill it: square on laptops, 4:3 on phones. Keep the product centered. With more than one photo, arrows appear and phones can swipe.
 
-## 3. Media slots (product metafields)
-**Settings → Metafields and metaobjects → Products → Add definition**, once per row.
-Shopify fills in the key from the name automatically. **Edit the key so it matches exactly.**
+## 3. Clip videos (one product metafield)
+The "Watch real cats hunt" section has 4 vertical clip frames.
+**Settings → Metafields and metaobjects → Products → Add definition:**
 
 | Name | Namespace and key | Type | Accepts | Storefronts access |
 |---|---|---|---|---|
-| LP Chase video | `custom.lp_chase_video` | File · **One file** | Videos | **On** |
-| LP Projection close-up | `custom.lp_projection_image` | File · **One file** | Images | **On** |
-| LP Room setup | `custom.lp_room_image` | File · **One file** | Images | **On** |
-| LP Box contents | `custom.lp_kit_image` | File · **One file** | Images | **On** |
+| LP Clip videos | `custom.lp_clip_videos` | File · **List of files** | Videos | **On** |
 
-Then open **Products → MouseDash Cat Projector**, scroll to **Metafields**, upload one file per slot, and **Save**:
+Shopify fills in the key from the name; **edit it so it matches exactly**.
+Then open the product, scroll to **Metafields → LP Clip videos**, upload up to 4 vertical (9:16) MP4 clips **in this order**, and **Save**:
 
-| Field | What to upload | Where it shows |
+| # | Title on the page | What to film |
 |---|---|---|
-| LP Chase video | A cat chasing the projected mouse. MP4, landscape, short (10–30 s). | Gallery "Chase video" + "Follow the mouse." (large frame) |
-| LP Projection close-up | The mouse-and-holes pattern on the floor, close up | Gallery "Projection" + "Follow the mouse." (small frame) |
-| LP Room setup | The projector on the floor in a room, lens facing open space | Gallery "Room setup" + "Ready for the first pounce?" |
-| LP Box contents | Projector and power cable laid out together | Gallery "In the box" + "What comes with MouseDash?" |
+| 1 | Lights down, mice out | The plug-in, the dark room and the first mouse |
+| 2 | The first pounce | Close on paws hitting a glowing hole |
+| 3 | Two cats, one hunt | Each cat picks a hole and waits |
+| 4 | The 3 a.m. zoomies fix | Ten minutes of chasing before bed |
 
-An empty slot shows the design's grey placeholder (icon and label), so you can see which ones are still missing. **Fill all four before launch.**
+Empty frames keep the design's illustration. **Once at least one clip is uploaded**, the page also shows
+"Filmed with real cats in real homes. No AI in our videos." and "Every clip is one take… No edits that make
+the mice look brighter than they are." Only upload clips that make those true.
 
-## 4. Pack discounts (Duo and Trio)
-The page shows Duo and Trio prices, but **Shopify only charges them if these discounts exist**.
+If you created the earlier metafields (`lp_chase_video`, `lp_projection_image`, `lp_room_image`, `lp_kit_image`), the new design doesn't use them. You can delete them.
+
+## 4. Pack discounts (2-pack and 3-pack)
+The page shows 2-pack and 3-pack prices, but **Shopify only charges them if these discounts exist**.
 **Discounts → Create discount → Amount off products → Method: Automatic discount**, one each:
 
 | Title | Discount value | Applies to | Minimum purchase requirement | Combinations |
 |---|---|---|---|---|
-| MouseDash Duo | Fixed amount **$5.00**, **"Apply discount to each eligible item"** (not "once per order") | Specific products → MouseDash Cat Projector | Minimum quantity of items: **2** | leave all unticked |
-| MouseDash Trio | Fixed amount **$10.00**, **"Apply discount to each eligible item"** | Specific products → MouseDash Cat Projector | Minimum quantity of items: **3** | leave all unticked |
+| MouseDash 2-pack | Fixed amount **$5.00**, **"Apply discount to each eligible item"** (not "once per order") | Specific products → MouseDash | Minimum quantity of items: **2** | leave all unticked |
+| MouseDash 3-pack | Fixed amount **$10.00**, **"Apply discount to each eligible item"** | Specific products → MouseDash | Minimum quantity of items: **3** | leave all unticked |
 
-With 3 items both discounts qualify, and Shopify applies the better one (Trio).
-Checkout totals should then be: **1 = $39.99, 2 = $69.98, 3 = $89.97**.
+With 3 items both discounts qualify, and Shopify applies the better one.
+At today's $39.00 price, checkout totals should be: **1 = $39.00, 2 = $68.00, 3 = $87.00**.
 Tell me when they're saved and I'll check all three totals with test carts. That doesn't place any orders.
 
 ## 5. Shipping and Markets
-1. **Settings → Shipping and delivery → General shipping rates:** create zones and rates that match what you promise (countries, price, delivery time). Name the rate so customers understand it, e.g. "Standard shipping (5–8 business days)".
-2. **Settings → Markets:** every country in a shipping zone must be in an **active** market, or it can't check out.
-3. The FAQ answer "What are the shipping and return terms?" links to your Shipping and Refund policies, so keep those in sync with the rates.
+1. **Settings → Shipping and delivery:** a **free** US rate. The page promises **ships in 1 to 3 days, arrives in 5 to 10 business days, with tracking**, so name the rate to match, e.g. "Free tracked shipping (5–10 business days)".
+2. **Settings → Markets:** the United States market is active.
+3. **Christmas:** the page says "Order by Dec 8 for delivery before Christmas" until the end of Dec 8 (US Eastern), then drops it by itself.
 
 ## 6. Policies
-**Settings → Policies:** save text in **Refund policy, Shipping policy, Privacy policy and Terms of service**.
-The footer links to all four, and a policy that isn't saved gives a 404 page. If you like, I can draft them from your shipping and return terms.
+**Settings → Policies:** paste the Refund, Shipping and Terms text from `docs/policies.md` and save.
+In the Privacy policy, replace any personal email with `contact@pounceclub.store`.
 
-## 7. Contact email
-Send me the customer-service email. Until it's set in `app/lib/lp-config.ts` (`BRAND.contactEmail`),
-the Contact page and its footer link stay hidden.
+## 7. Domains
+1. **Hydrogen → Pounce Club → Storefront settings → Domains:** `pounceclub.store` and `www.pounceclub.store` both on **Production**.
+2. `checkout.pounceclub.store` stays the **Online Store's primary domain**, so checkout runs on your own domain.
+3. "View your store" in admin opens the Online Store theme, **not** this page. Check https://pounceclub.store instead.
 
-## 8. Connect the storefront and domain
-1. **Sales channels → Hydrogen → Create storefront → connect the GitHub repo `officialecombulls-alt/Pounce-club`.**
-   Shopify adds a deploy workflow to the repo. **From then on, every push to `main` goes live.**
-2. **Hydrogen → Pounce Club → Storefront settings → Domains:** assign your domain and `www.` to **Production**.
-   (If the domain is attached to the Online Store instead, it shows the theme, not this page.)
-3. **Checkout on your own domain:** add `checkout.<your-domain>` and make it the **Online Store's primary domain**. Otherwise checkout runs on `*.myshopify.com`.
-4. "View your store" in admin opens the Online Store theme, **not** this page. Check the Hydrogen production domain instead.
-
-## 9. Brand at checkout
-**Settings → Checkout → Customize:** logo, and the page's red `#b3122a` as the accent and button color, so checkout looks like the page.
+## 8. Brand at checkout
+**Settings → Checkout → Customize:** logo, and the page's red `#e3242b` as the accent and button color, so checkout looks like the page.
