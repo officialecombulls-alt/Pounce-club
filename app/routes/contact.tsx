@@ -1,5 +1,5 @@
 import { LP_HOME, LpPage } from "~/components/lp/LpPage";
-import { BRAND } from "~/lib/lp-config";
+import { BRAND, GUARANTEE_DAYS } from "~/lib/lp-config";
 import { formatPageTitle, getShopNameFromRootMatch } from "~/lib/storefront-shop";
 import lpStylesHref from "~/styles/lp.css?url";
 
@@ -55,10 +55,10 @@ export default function ContactRoute({ loaderData }: Route.ComponentProps) {
         <h2>Quick answers</h2>
         <ul>
           <li>
-            <a href="/policies/shipping-policy">Shipping policy</a>: where we ship, delivery times and tracking
+            <a href="/policies/shipping-policy">Shipping policy</a>: free US shipping, delivery and tracking
           </li>
           <li>
-            <a href="/policies/refund-policy">Refund policy</a>: returns and refunds
+            <a href="/policies/refund-policy">Refund policy</a>: our {GUARANTEE_DAYS}-day money-back guarantee
           </li>
           <li>
             <a href={`${LP_HOME}#faq`}>FAQs</a>: floors, power and multiple cats

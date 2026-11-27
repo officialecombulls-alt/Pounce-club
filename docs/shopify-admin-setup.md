@@ -11,6 +11,18 @@ layout and new sections.
 
 ---
 
+## 0. Fix these first (found on the live site, 27 Nov 2026)
+1. **Prices show in NPR, not USD.** The page asks Shopify for United States prices, but they come back as
+   "NPR 39.00", so the store's currency is Nepalese rupees. To sell at $39.99 in the US, either:
+   - **Settings → General → Store defaults → Currency display: change the store currency to USD** (only possible before the first sale; simplest if you sell only in the US), then set the price to `39.99`; or
+   - **Settings → Markets → add a "United States" market** with currency **USD**, and set a **fixed US price** of $39.99 on the product (Markets → United States → Products and pricing).
+   The pack discounts ($5 and $10 off each) are in the store currency too, so they only work out once prices are in USD.
+2. **The product shows "Sold out".** Open the product and check:
+   - **Inventory:** "Track quantity" is on with 0 in stock. Add stock, or untick "Track quantity", or tick "Continue selling when out of stock".
+   - **Markets:** the product is included in the United States market.
+   - **Sales channels:** the Hydrogen storefront is ticked.
+3. **`www.pounceclub.store` goes to the checkout domain.** In **Sales channels → Hydrogen → Pounce Club → Storefront settings → Domains**, add `www.pounceclub.store` to **Production** too. `pounceclub.store` already works, and `checkout.pounceclub.store` is right as the Online Store's primary domain.
+
 ## 1. Store basics
 1. **Online Store → Preferences → Password protection:** off. While it's on, checkout sends buyers to the password page.
 2. **Settings → Payments:** a payment provider is active. Without one, checkout says "This store can't accept payments right now".
@@ -21,7 +33,7 @@ layout and new sections.
 1. **Title:** `MouseDash Cat Projector` (shown as the big heading next to the gallery).
 2. **Price:** `39.99`. **Compare-at price:** leave empty unless the regular price really is higher. When it's set, the page shows it crossed out on every pack.
 3. **Shipping:** tick **"This is a physical product"** and enter the packed weight. Without this, checkout only asks for a billing address and charges no shipping.
-4. **Handle** (Search engine listing → URL handle): `mousedash-cat-projector`. It has to match `LP_PRODUCT_HANDLE` in `app/lib/lp-config.ts`. If yours is different, tell me and I'll change the code.
+4. **Handle** (Search engine listing → URL handle): `mousedash-floor-projector-for-cats`. It has to match `LP_PRODUCT_HANDLE` in `app/lib/lp-config.ts`. Don't change it without telling me, or the homepage breaks.
 5. **Media:** the **first** product image is the "Product" view in the gallery and the first thing people see. Frames are light grey (`#efefef`) and photos are shown whole, not cropped, so a photo on a light grey or transparent background blends in best. Use landscape, at least 1400 px wide.
 6. **Sales channels:** make sure the product is available on the Hydrogen storefront.
 

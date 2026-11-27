@@ -11,7 +11,7 @@ export const BRAND = {
    * Customer-service email. While empty, the Contact page and its footer link
    * stay hidden (a contact page with no way to reach anyone is worse than none).
    */
-  contactEmail: "",
+  contactEmail: "contact@pounceclub.store",
 };
 
 /** Short product name for the promo bar and sticky bar ("MouseDash"). */
@@ -21,7 +21,10 @@ export const PRODUCT_SHORT_NAME = "MouseDash";
  * Shopify handle of the MouseDash product (the end of its product URL in admin).
  * The homepage and /products/<handle> redirect to /lp/<handle>.
  */
-export const LP_PRODUCT_HANDLE = "mousedash-cat-projector";
+export const LP_PRODUCT_HANDLE = "mousedash-floor-projector-for-cats";
+
+/** Money-back guarantee, in days (FAQ, contact page). Must match the Refund policy in Shopify. */
+export const GUARANTEE_DAYS = 45;
 
 /** While true, the homepage (/) redirects to the landing page. Set false to bring the store homepage back. */
 export const HOME_IS_LANDING_PAGE: boolean = true;

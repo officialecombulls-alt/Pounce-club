@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-import { PRODUCT_SHORT_NAME } from "~/lib/lp-config";
+import { GUARANTEE_DAYS, PRODUCT_SHORT_NAME } from "~/lib/lp-config";
 
 import { LpMedia, type LpMediaSlot } from "./LpMedia";
 
@@ -130,8 +130,8 @@ export function Faq() {
         <details className="fold" id="ordering" ref={ordering}>
           <summary>What are the shipping and return terms?</summary>
           <p>
-            Shipping fees and delivery times are in our <a href="/policies/shipping-policy">Shipping policy</a>.
-            The return window and how returns work are in our{" "}
+            Shipping is free on every US order. {PRODUCT_SHORT_NAME} comes with a {GUARANTEE_DAYS}-day money-back
+            guarantee. The details are in our <a href="/policies/shipping-policy">Shipping policy</a> and{" "}
             <a href="/policies/refund-policy">Refund policy</a>.
           </p>
         </details>
