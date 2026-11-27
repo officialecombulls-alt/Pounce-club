@@ -245,68 +245,23 @@ export function Why() {
   );
 }
 
-export function Compare() {
+export function Specs() {
   return (
-    <section className="band" id="compare">
-      <div className="wrap two">
-        <div>
-          <h2>How it compares</h2>
-          <div className="scroll">
-            <table>
-              <thead>
-                <tr>
-                  <th scope="col">
-                    <span className="note">Feature</span>
-                  </th>
-                  <th scope="col">{PRODUCT_SHORT_NAME}</th>
-                  <th scope="col">Laser pointer</th>
-                  <th scope="col">Feather wand</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">You hold it</th>
-                  <td className="us">No</td>
-                  <td>Yes</td>
-                  <td>Yes</td>
-                </tr>
-                <tr>
-                  <th scope="row">Targets</th>
-                  <td className="us">Several mice and holes</td>
-                  <td>One dot</td>
-                  <td>One lure</td>
-                </tr>
-                <tr>
-                  <th scope="row">Power</th>
-                  <td className="us">USB cable</td>
-                  <td>Batteries</td>
-                  <td>None</td>
-                </tr>
-                <tr>
-                  <th scope="row">Best for</th>
-                  <td className="us">Evening play, two cats</td>
-                  <td>Short bursts with you</td>
-                  <td>Play together</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <div>
-          <h2>Specs and box</h2>
-          <dl>
-            <dt>Size</dt>
-            <dd>6.3 in (16 cm) tall</dd>
-            <dt>Power</dt>
-            <dd>USB cable to a wall adapter, no batteries</dd>
-            <dt>Controls</dt>
-            <dd>One button on top</dd>
-            <dt>Floors</dt>
-            <dd>Clear, smooth floors in a dim room</dd>
-            <dt>In the box</dt>
-            <dd>Projector, USB cable and wall adapter</dd>
-          </dl>
-        </div>
+    <section className="band" id="specs">
+      <div className="wrap specs">
+        <h2>Specs and box</h2>
+        <dl>
+          <dt>Size</dt>
+          <dd>6.3 in (16 cm) tall</dd>
+          <dt>Power</dt>
+          <dd>USB cable to a wall adapter, no batteries</dd>
+          <dt>Controls</dt>
+          <dd>One button on top</dd>
+          <dt>Floors</dt>
+          <dd>Clear, smooth floors in a dim room</dd>
+          <dt>In the box</dt>
+          <dd>Projector, USB cable and wall adapter</dd>
+        </dl>
       </div>
     </section>
   );

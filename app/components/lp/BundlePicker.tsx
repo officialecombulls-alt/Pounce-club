@@ -7,8 +7,8 @@ import { useReducedMotion } from "./LpArt";
 
 /**
  * "Choose your bundle" picker, ported from reference/bundle.html: picking a
- * pack switches its card to the night floor with mice running. Every price,
- * saving and percentage comes from the Shopify price and compare-at price
+ * pack switches its card to the night floor with mice running. Every price
+ * and saving comes from the Shopify price and compare-at price
  * (see bundleOffers); the pack discounts mirror Shopify automatic discounts.
  */
 
@@ -78,26 +78,6 @@ function CardScene({ n, animate }: { n: number; animate: boolean }) {
   );
 }
 
-function CheckIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 14 14">
-      <path d="M3 7l3 3 5-6" fill="none" stroke="currentColor" strokeWidth="2.2" />
-    </svg>
-  );
-}
-
-function LockIcon() {
-  return (
-    <svg width="12" height="12" viewBox="0 0 12 12">
-      <rect x="2" y="5" width="8" height="6" rx="1.5" fill="currentColor" />
-      <path d="M4 5V4a2 2 0 0 1 4 0v1" fill="none" stroke="currentColor" strokeWidth="1.5" />
-    </svg>
-  );
-}
-
-const percentOff = (offer: BundleOffer) =>
-  offer.regularTotal > 0 ? Math.round((offer.saving / offer.regularTotal) * 100) : 0;
-
 /** Adds business days (Mon–Fri) to a date. */
 function addBusinessDays(from: Date, days: number) {
   const date = new Date(from);
@@ -149,21 +129,6 @@ export function BundlePicker({
 }) {
   const reduced = useReducedMotion();
   const arrival = useArrivalText();
-  const index = selected ? offers.indexOf(selected) : 0;
-  const next = offers[index + 1];
-  const last = Math.max(1, offers.length - 1);
-  const pct = selected ? percentOff(selected) : 0;
-
-  const perks = [
-    { text: "Free tracked shipping", need: 1 },
-    {
-      text:
-        selected && selected.quantity >= 2 && pct > 0 ? `Save ${pct}% on every projector` : "Bundle discount on every projector",
-      need: 2,
-    },
-    { text: "Lowest price per projector", need: 3 },
-  ];
-
   const submit = (event: FormEvent) => {
     event.preventDefault();
     onBuy();
@@ -211,50 +176,6 @@ export function BundlePicker({
           </label>
         ))}
       </fieldset>
-
-      <div className="ladder" aria-live="polite">
-        <div className="lhead">
-          Price per projector<span>{pct ? `${pct}% off` : "Full price"}</span>
-        </div>
-        <div className="track">
-          <div className="fill" style={{ width: `${(index / last) * 100}%` }} />
-          {offers.map((offer, i) => (
-            <span key={offer.quantity} className={i <= index ? "stop on" : "stop"} style={{ left: `${(i / last) * 100}%` }} />
-          ))}
-        </div>
-        <div className="ticks">
-          {offers.map((offer) => (
-            <div key={offer.quantity}>
-              <b>{formatMoney(offer.each, offer.currencyCode)}</b>
-              <span>{projectorCount(offer.quantity)}</span>
-            </div>
-          ))}
-        </div>
-        <p className="nudge">
-          {next && selected ? (
-            <>
-              Add {next.quantity - selected.quantity} more and pay <b>{formatMoney(next.each, next.currencyCode)}</b> each
-            </>
-          ) : (
-            "You have the lowest price per projector."
-          )}
-        </p>
-      </div>
-
-      <ul className="perks">
-        {perks.map((perk) => {
-          const on = (selected?.quantity ?? 0) >= perk.need;
-          return (
-            <li key={perk.need} className={on ? "perk" : "perk locked"}>
-              <span className="ic" aria-hidden="true">
-                {on ? <CheckIcon /> : <LockIcon />}
-              </span>
-              <span>{perk.text}</span>
-              <em>{on ? "Included" : `With ${perk.need} projectors`}</em>
-            </li>
-          );
-        })}
-      </ul>
 
       <div className="total">
         <div className="sum">

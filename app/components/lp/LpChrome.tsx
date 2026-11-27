@@ -20,7 +20,7 @@ export function LpNav({ home = "" }: { home?: string }) {
       <nav aria-label="Sections">
         <a href={`${home}#how`}>How it works</a>
         <a href={`${home}#watch`}>Watch it</a>
-        <a href={`${home}#compare`}>Compare</a>
+        <a href={`${home}#specs`}>Specs</a>
         <a href={`${home}#faq`}>FAQ</a>
       </nav>
       <a className="btn" href={`${home}#buy`}>

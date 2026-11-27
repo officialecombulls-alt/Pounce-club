@@ -156,26 +156,6 @@ html:has(.lp) {
 .lp .card .amt s { font-size: 14px; color: var(--soft); }
 .lp .card .amt small { display: block; font-size: 13px; color: var(--soft); font-weight: 600; }
 .lp .card:has(input:checked) .amt s, .lp .card:has(input:checked) .amt small { color: #d8bfb6; }
-.lp .ladder { margin-top: 20px; padding: 16px 18px 14px; border-radius: 16px; background: var(--card); border: 1px solid var(--line); }
-.lp .lhead { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: 14px; font-weight: 700; }
-.lp .lhead span { color: var(--soft); font-weight: 600; }
-.lp .track { position: relative; height: 10px; margin: 20px 10px 8px; border-radius: 99px; background: light-dark(#efe7e3, #2c221e); }
-.lp .track .fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 99px; background: linear-gradient(90deg, #f07a80, var(--red)); transition: width .35s ease; }
-.lp .track .stop { position: absolute; top: 50%; width: 22px; height: 22px; margin: -11px 0 0 -11px; border-radius: 50%; background: var(--card); border: 3px solid light-dark(#e2d7d2, #3d302a); transition: border-color .3s, background .3s; }
-.lp .track .stop.on { border-color: var(--red); background: var(--red); }
-.lp .ticks { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); font-size: 13px; margin-top: 12px; }
-.lp .ticks div:nth-child(2) { text-align: center; }
-.lp .ticks div:nth-child(3) { text-align: right; }
-.lp .ticks b { display: block; font-size: 15px; font-weight: 800; }
-.lp .ticks span { color: var(--soft); }
-.lp .nudge { margin-top: 12px; font-size: 14px; font-weight: 600; color: var(--soft); min-height: 21px; }
-.lp .nudge b { color: var(--red); }
-.lp .perks { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 8px; }
-.lp .perk { display: grid; grid-template-columns: 26px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 12px; background: var(--card); border: 1px solid var(--line); font-size: 15px; font-weight: 600; transition: opacity .25s; }
-.lp .perk .ic { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: var(--red); color: #fff; }
-.lp .perk em { font-style: normal; font-size: 13px; color: var(--soft); font-weight: 600; white-space: nowrap; }
-.lp .perk.locked { opacity: .55; }
-.lp .perk.locked .ic { background: light-dark(#e6ddd8, #3a2d27); color: var(--soft); }
 .lp .total { margin-top: 18px; display: grid; gap: 12px; }
 .lp .sum { display: flex; justify-content: space-between; align-items: end; gap: 12px; }
 .lp .sum b { font-size: 28px; font-weight: 800; letter-spacing: -.01em; white-space: nowrap; }
@@ -218,16 +198,9 @@ html:has(.lp) {
 .lp .why li p { color: var(--soft); margin-top: 4px; }
 .lp .why > div > p { color: var(--soft); margin-top: 14px; }
 
-/* compare + specs */
+/* specs */
 .lp .panel { background: var(--panel); }
-.lp .two { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: clamp(24px, 4vw, 56px); align-items: start; }
-.lp .scroll { overflow-x: auto; }
-.lp table { border-collapse: collapse; width: 100%; font-size: 16px; margin-top: 22px; }
-.lp th, .lp td { text-align: left; padding: 12px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
-.lp thead th { font-weight: 800; font-size: 15px; }
-.lp thead th:nth-child(2) { color: var(--red); }
-.lp tbody th { font-weight: 700; color: var(--soft); font-size: 15px; width: 26%; }
-.lp td.us { font-weight: 700; }
+.lp .specs { max-width: 760px; }
 .lp dl { margin: 22px 0 0; display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 10px 18px; }
 .lp dt { font-weight: 800; }
 .lp dd { margin: 0; color: var(--soft); }
@@ -285,9 +258,9 @@ html:has(.lp) {
 .lp .contact-btn { margin-top: 8px; }
 
 @media (max-width: 900px) {
-  .lp .buy, .lp .why, .lp .two, .lp .care, .lp .gift .wrap { grid-template-columns: minmax(0, 1fr); }
-  /* relative, not static: the photo arrows are positioned inside the stage. */
-  .lp .stage { position: relative; top: auto; aspect-ratio: 4/3; }
+  .lp .buy, .lp .why, .lp .care, .lp .gift .wrap { grid-template-columns: minmax(0, 1fr); }
+  /* relative, not static: the photo arrows are positioned inside the stage. Stays square (1:1) like desktop. */
+  .lp .stage { position: relative; top: auto; }
   .lp .clip { flex-basis: 46%; }
 }
 @media (max-width: 720px) {
@@ -302,11 +275,6 @@ html:has(.lp) {
   .lp .clip { flex-basis: 72%; }
   .lp .bar.visible { display: flex; }
 }
-@media (max-width: 600px) {
-  .lp table { font-size: 14px; }
-  .lp th, .lp td { padding: 9px 6px; }
-  .lp tbody th { width: 30%; }
-}
 @media (max-width: 480px) {
   .lp .card { grid-template-columns: 96px minmax(0, 1fr); padding: 10px 14px 10px 10px; gap: 12px; }
   .lp .b-scene { width: 96px; height: 72px; }
@@ -317,5 +285,5 @@ html:has(.lp) {
 }
 @media (prefers-reduced-motion: reduce) {
   html:has(.lp) { scroll-behavior: auto; }
-  .lp .card, .lp .b-night, .lp .b-day, .lp .track .fill, .lp .track .stop, .lp .perk { transition: none; }
+  .lp .card, .lp .b-night, .lp .b-day { transition: none; }
 }

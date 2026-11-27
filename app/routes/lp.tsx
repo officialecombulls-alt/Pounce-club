@@ -9,12 +9,12 @@ import { LpFooter, LpNav, LpStrip, StickyBar } from "~/components/lp/LpChrome";
 import {
   CareAndFaq,
   Closing,
-  Compare,
   Gift,
   Hero,
   HowItWorks,
   type LpVideo,
   Watch,
+  Specs,
   Why,
 } from "~/components/lp/LpSections";
 import { type LpCartLine, type LpVariant, useLpCheckout } from "~/components/lp/useLpCheckout";
@@ -329,7 +329,7 @@ export default function LandingPage({ loaderData }: Route.ComponentProps) {
         <Watch videos={clips} />
         <HowItWorks />
         <Why />
-        <Compare />
+        <Specs />
         <Gift
           duoLabel={duo ? formatMoney(duo.total, duo.currencyCode) : null}
           onPickTwo={() => duo && setQuantity(2)}
